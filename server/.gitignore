@@ -1,0 +1,6 @@
+/books/pdf/*
+/books/audio/*
+/books/covers/*
+.env
+/.venv/
+/lib/__pycache__/
