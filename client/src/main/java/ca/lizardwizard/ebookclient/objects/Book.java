@@ -1,10 +1,17 @@
 package ca.lizardwizard.ebookclient.objects;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Book {
+    @SerializedName("id")
     private int id;
+    @SerializedName("name")
     private String name;
+    @SerializedName("author")
     private String author;
+    @SerializedName("description")
     private String description;
+    @SerializedName("coverURL")
     private String coverURL;
 
     public Book(int id, String name, String author, String description, String coverURL) {
@@ -53,5 +60,10 @@ public class Book {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString(){
+        return getName();
     }
 }

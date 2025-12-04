@@ -22,7 +22,7 @@
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  A PARTICULAR PURPOSEc ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
@@ -33,7 +33,9 @@
 -->
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -47,8 +49,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.lizardwizard.ebookclient.MainController">
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>
@@ -91,12 +94,17 @@
         </MenuBar>
         <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
             <items>
-                <AnchorPane />
+            <VBox>
+               <children>
+                  <ListView fx:id="BookList" prefHeight="200.0" prefWidth="200.0" />
+                  <Button fx:id="AddBookButton" mnemonicParsing="false" styleClass="btn-default" text="Button" />
+               </children>
+            </VBox>
                 <ScrollPane prefHeight="-1.0" prefWidth="-1.0">
                     <content>
                         <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0" prefHeight="545.0" prefWidth="430.0">
                             <children>
-                                <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" style="&#10;" text="Now Listening" textAlignment="CENTER" wrapText="false">
+                                <Label fx:id="NowListeningText" alignment="CENTER" layoutX="14.0" layoutY="14.0" style="&#10;" text="Now Listening" textAlignment="CENTER" wrapText="false">
                                     <font>
                                         <Font size="18.0" fx:id="x1" />
                                     </font>
@@ -107,20 +115,27 @@
                         </AnchorPane>
                     </content>
                 </ScrollPane>
-                <AnchorPane>
-                    <children>
-                        <Label id="BookDetailsTitle" fx:id="BookDetailsText" alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
-                        <VBox alignment="TOP_CENTER" layoutY="41.0" prefHeight="511.0" prefWidth="221.0">
-                            <children>
-                                <ImageView fx:id="DetailsBookImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                                    <VBox.margin>
-                                        <Insets top="10.0" />
-                                    </VBox.margin>
-                                </ImageView>
-                            </children>
-                        </VBox>
-                    </children>
-                </AnchorPane>
+                  <VBox alignment="TOP_CENTER" prefHeight="511.0" prefWidth="221.0">
+                      <children>
+                  <HBox prefHeight="30.0" prefWidth="200.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Book details">
+                           <font>
+                              <Font size="25.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="5.0" top="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                          <ImageView fx:id="DetailsBookImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                              <VBox.margin>
+                                  <Insets top="10.0" />
+                              </VBox.margin>
+                          </ImageView>
+                      </children>
+                  </VBox>
             </items>
         </SplitPane>
         <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
