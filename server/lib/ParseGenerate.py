@@ -8,6 +8,10 @@ from PyPDF2 import PdfReader
 import numpy as np
 from kokoro import KPipeline
 from transformers import pipeline
+
+import uuid
+
+
 available_device = 'cpu' #Must use cpu in order to utilize threading.
 
 pipeline = KPipeline(lang_code='a',device=available_device)
@@ -56,7 +60,7 @@ fileName: name of the pdf file (dont include .pdf)
 Filters: terms to be filtered out, sometimes pdfs contain watermarks around the pdf such as "Free eBooks at Planet eBook.com"
 StartingPage: specifies which page to start reading from useful for skipping title pages or personal notes from the writer
 '''
-def getTextFromPDF(fileName,filters):
+def getTextFromPDF(fileName):
     print(currentDirectory)
     reader = PdfReader(bookDirectory + "\\" +fileName+".pdf")
     text = ""
@@ -73,22 +77,23 @@ def getTextFromPDF(fileName,filters):
 Future additions: voice choice, language
 Generates wav file from text passed in
 text: Text to be spoken
-fileName: name of the final outputted file (Dont include and extension, outputs.wav)
 """
-def generateTTS(text,fileName):
+def generateTTS(text):
     generator = pipeline(text, voice='af_heart')
     fullAudio = []
     for i, (gs, ps, audio) in enumerate(generator):
         fullAudio.append(audio)
     print(len(fullAudio))
-
-    print(fullAudio)
+    #Generate UUID for audio files name
+    fileName = uuid.uuid4()
     sf.write(f'{audioDirectory}\\{fileName}.wav', np.concatenate(fullAudio), 24000)
-    return
+    return f"{fileName}" #Return filename in string format for sql storage
 
 
 
 def grabAndGenerate(pdfName):
-    text = getTextFromPDF(pdfName,"")
-    generateTTS(text,pdfName)
-    return True
+    text = getTextFromPDF(pdfName)
+    print("Extracted text from pdf:")
+    print(text[0:500])#Print first 500 characters for testing
+    fileName = generateTTS(text)
+    return fileName#Return filename for sql

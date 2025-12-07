@@ -6,6 +6,8 @@ module ca.lizardwizard.ebookclient {
     requires java.net.http;
     requires java.compiler;
     requires com.google.gson;
+    requires java.desktop;
+
 
     opens ca.lizardwizard.ebookclient to javafx.fxml;
     exports ca.lizardwizard.ebookclient;

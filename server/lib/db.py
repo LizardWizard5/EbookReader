@@ -7,18 +7,25 @@ from flask import jsonify
 
 class connection:
     def __init__(self,host, user, password):
-        self.conn = mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            database="ebookreader"
-        )
-        self.cursor = self.conn.cursor()
-        self.cursor = self.conn.cursor(dictionary=True)
-        print("Database connection established.")
-        print(self.conn.is_connected())
+        try:
+            self.conn = mysql.connector.connect(
+                host=host,
+                user=user,
+                password=password,
+                database="ebookreader"
+            )
+            self.cursor = self.conn.cursor(dictionary=True)
+        except mysql.connector.Error as e:
+            print(f"Error connecting to database: {e}")
+            # Option 1: mark as failed but keep object
+            self.conn = None
+            self.cursor = None
+        
     def getBookInfo(self, book_id):
-        pass
+        self.cursor.execute("SELECT * FROM books WHERE id = %s;", (book_id,))
+        res = self.cursor.fetchone()
+        return res
+
     def getBookPaths(self, book_id):
         pass
     def getAllBooks(self):
@@ -26,8 +33,8 @@ class connection:
         res = self.cursor.fetchall()
         return res
 
-    def createBookEntry(self, book_name, author_name, pdf_name, audio_name):
-        self.cursor.execute("INSERT INTO books (name, author, pdfName, audioName) VALUES (%s, %s, %s, %s)", ( book_name, author_name, pdf_name, audio_name))
+    def createBookEntry(self, book_name, author_name, pdf_name, audio_name,cover_name=""):
+        self.cursor.execute("INSERT INTO books (name, author, pdfName, audioName,coverName) VALUES (%s, %s, %s, %s,%s)", ( book_name, author_name, pdf_name, audio_name,cover_name))
         self.conn.commit()
     #Removed until user system is implemented
     #def getUserBooks(self, user_id):
