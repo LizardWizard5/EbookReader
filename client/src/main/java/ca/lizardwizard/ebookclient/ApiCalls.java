@@ -10,12 +10,18 @@ import java.net.http.HttpResponse;
 
 public class ApiCalls {
 
+
     public static Book[] getBooks() throws IOException, InterruptedException {
-        HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest req = HttpRequest.newBuilder().uri(URI.create("http://127.0.0.1:5000/books")).build();
-        HttpResponse<String> resp = httpClient.send(req,HttpResponse.BodyHandlers.ofString());
-        Gson gson = new Gson();
-        return gson.fromJson(resp.body(),Book[].class);
+        try {
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpRequest req = HttpRequest.newBuilder().uri(URI.create("http://127.0.0.1:5000/books")).build();
+            HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+            Gson gson = new Gson();
+            return gson.fromJson(resp.body(), Book[].class);
+        } catch (IOException e){
+            throw new IOException("Error: API books request failed.",e);
+        }
+
     }
 
 
