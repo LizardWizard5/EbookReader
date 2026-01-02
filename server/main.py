@@ -4,6 +4,7 @@ import os
 from flask import Flask, jsonify, Response
 from dotenv import load_dotenv
 from lib.db import connection
+from lib.Audio import getChunkFromMS
 
 load_dotenv()  # reads variables from a .env file and sets them in os.environ
 currentDirectory = os.getcwd()
@@ -14,19 +15,21 @@ audioDirectory = currentDirectory + "\\books\\audio"
 db = connection(host=os.getenv("HOST"), user=os.getenv("USER"), password=os.getenv("PASSWORD"))
     
 app = Flask(__name__)
-
-@app.route('/stream_audio/<book_id>')
-def stream_audio(book_id):
+"""
+Returns a chunk of audio based on ms input. 
+"""
+@app.route('/stream_audio/<book_id>/<int:ms>')
+def getChunk(book_id,ms):
+    if ms < 0 or ms is None:
+        ms = 0  # Ensure ms is non-negative
     def generate_audio():
         bookInfo = db.getBookInfo(book_id)
         audioFileName = bookInfo['audioName']   
         print(f"Streaming audio file: {audioFileName}")
-        with open(f'{audioDirectory}\\{audioFileName}.wav', 'rb') as f:
-            while True:
-                chunk = f.read(1024000)  # Read in 1MB chunks
-                if not chunk:
-                    break
-                yield chunk
+        audioFilePath = f'{audioDirectory}\\{audioFileName}.wav'
+
+        chunk = getChunkFromMS(audioFilePath, ms)
+        yield chunk
 
     return Response(generate_audio(), mimetype='audio/wav')
 
