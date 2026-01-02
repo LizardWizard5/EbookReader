@@ -20,19 +20,7 @@ public class TestMain {
 
             System.out.println("Audio length (s): " + player.getLengthSeconds());
 
-            // 3) Demo controls
-            System.out.println("Playing...");
-            player.play();
-            Thread.sleep(5000);
-
-            System.out.println("Pausing...");
-            player.pause();
-            Thread.sleep(2000);
-
-            System.out.println("Rewinding and playing again...");
-            player.rewind();
-            player.play();
-            Thread.sleep(5000);
+            System.out.println("Length of audio: " + player.getFormattedLength());
 
             player.close();
 

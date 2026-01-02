@@ -101,22 +101,32 @@
             </VBox>
             <VBox alignment="BOTTOM_CENTER" prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <HBox alignment="TOP_CENTER" prefHeight="20.0" prefWidth="443.0">
+                  <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <Button fx:id="rewindButton" mnemonicParsing="false" onAction="#onRewindButton" text="-10s" />
-                        <Slider fx:id="audioTimeline" minWidth="250.0">
-                           <HBox.margin>
-                              <Insets left="5.0" right="5.0" top="5.0" />
-                           </HBox.margin>
-                        </Slider>
-                        <Button fx:id="fastForwardButton" mnemonicParsing="false" onAction="#onFastForwardButton" text="+10s" />
+                        <Text fx:id="DebugText" strokeType="OUTSIDE" strokeWidth="0.0" text="DebugTedxt" />
+                        <Text fx:id="timeText" strokeType="OUTSIDE" strokeWidth="0.0" text="00:00:00/00:00:00 (0% Completed)" textAlignment="CENTER" wrappingWidth="241.25390625">
+                           <VBox.margin>
+                              <Insets left="100.0" />
+                           </VBox.margin>
+                        </Text>
+                        <HBox alignment="TOP_CENTER" prefHeight="20.0" prefWidth="443.0">
+                           <children>
+                              <Button fx:id="rewindButton" mnemonicParsing="false" onAction="#onRewindButton" text="-10s" />
+                              <Slider fx:id="audioTimeline" blockIncrement="0.01" minWidth="250.0" prefHeight="14.0" prefWidth="338.0">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </Slider>
+                              <Button fx:id="fastForwardButton" mnemonicParsing="false" onAction="#onFastForwardButton" text="+10s" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="playButton" mnemonicParsing="false" onAction="#onPlayButton" text="Play" />
+                           </children>
+                        </HBox>
                      </children>
-                  </HBox>
-                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <Button fx:id="playButton" mnemonicParsing="false" onAction="#onPlayButton" text="Play" />
-                     </children>
-                  </HBox>
+                  </VBox>
                </children>
             </VBox>
                   <VBox alignment="TOP_CENTER" prefHeight="511.0" prefWidth="221.0">

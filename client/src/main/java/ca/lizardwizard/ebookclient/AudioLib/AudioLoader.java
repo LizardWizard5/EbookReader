@@ -8,6 +8,7 @@ import java.net.URL;
 
 public class AudioLoader {
 
+    //Currently, this doesn't actually properly stream audio. It just takes the audio stream from the server waits until its all loaded in memory and then plays.
     public static byte[] downloadAudioToMemory(int bookId) throws IOException {
         String urlStr = "http://localhost:5000/stream_audio/" + bookId; // adjust host/port
         URL url = new URL(urlStr);
