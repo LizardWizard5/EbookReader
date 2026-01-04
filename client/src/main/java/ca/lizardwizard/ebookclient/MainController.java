@@ -1,7 +1,7 @@
 package ca.lizardwizard.ebookclient;
 
-import ca.lizardwizard.ebookclient.AudioLib.AudioLoader;
-import ca.lizardwizard.ebookclient.AudioLib.AudioPlayer;
+import ca.lizardwizard.ebookclient.Lib.ApiCalls;
+import ca.lizardwizard.ebookclient.Lib.AudioPlayer;
 import ca.lizardwizard.ebookclient.objects.Book;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -71,76 +71,82 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
-
-
         try{
             BookList.getItems().addAll(ApiCalls.getBooks());
             BookList.getSelectionModel().selectedItemProperty().addListener((observe, previousBook, currentBook)->{
+                player = new AudioPlayer(currentBook);
                 NowListeningText.setText("Now Listening to "+currentBook.getName() +"\nBy " + currentBook.getAuthor());
                 DetailsBookImage.setImage(new Image("http://localhost:5000/books/"+currentBook.getId()+"/cover"));
                 try {
-                    playButton.setText("Loading Audio...");
-                    // 1) Download to memory from your Flask streaming endpoint
-                    byte[] audioBytes = AudioLoader.downloadAudioToMemory(currentBook.getId());
-                    // 2) Load into in-memory player
-                    player.loadFromBytes(audioBytes);
+                    loadAudio(currentBook.getId(), 0);
+                } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
+                    throw new RuntimeException(e);
+                }
 
-                    player.play();
-                    playButton.setText("Pause");
-
-                    //Setup timeline
-                    timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> updateUI()));
+                //Setup timeline
+                timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> updateUI()));
                     timeline.setCycleCount(Timeline.INDEFINITE);
                     timeline.play();
 
-                }catch (IOException | UnsupportedAudioFileException | LineUnavailableException error){
-                    throw new RuntimeException(error);
-                }
 
             });
 
-            audioTimeline.valueProperty().addListener((obs, oldVal, newVal) -> {
+           /* audioTimeline.valueProperty().addListener((obs, oldVal, newVal) -> {
                 if ((newVal.doubleValue() <oldVal.doubleValue()) && ((newVal.doubleValue()+1) >oldVal.doubleValue()) ) //Quick fix where when adjusting value would double trigger because of manually moving timeline + updateUI moving it. Remove this line to inspect the issue.
                     return;
                 System.out.println("Slider value: " + newVal);
                 DebugText.setText("Slider value: " + String.format("%.2f", newVal.doubleValue()));
-                player.setByPercentage(newVal.doubleValue());
+                try {
+                    player.setByPercentage(newVal.doubleValue());
+                } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
+                    throw new RuntimeException(e);
+                }
 
-            });
+            });*/
 
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void updateUI(){
-        timeText.setText(player.getFormattedLength());
+    private void loadAudio(int id,int ms) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+//        playButton.setText("Loading Audio...");
+//        // 1) Download to memory from your Flask streaming endpoint
+//        byte[] audioBytes = ApiCalls.downloadAudioToMemory(id,ms);
+//        // 2) Load into in-memory player
+//        player.loadFromBytes(audioBytes);
+//
+//        player.play();
+//        playButton.setText("Pause");
+    }
 
-        audioTimeline.adjustValue(player.getPercentCompleted());
+    private void updateUI(){
+        //timeText.setText(player.getFormattedLength());
+
+        //audioTimeline.adjustValue(player.getPercentCompleted());
 
     }
 
     @FXML
     protected void onPlayButton(){
-        if(player.getIsPlaying()) {
+        /*if(player.getIsPlaying()) {
             player.pause();
             playButton.setText("Play");
         }
         else{
             player.play();
             playButton.setText("Pause");
-        }
+        }*/
     }
 
 
     @FXML
     protected void onRewindButton(){
-        player.rewind();
+        //player.rewind();
     }
 
     @FXML
     protected void onFastForwardButton(){
-        player.forward();
+        //player.forward();
     }
 }

@@ -24,13 +24,22 @@ def getChunk(book_id,ms):
         ms = 0  # Ensure ms is non-negative
     def generate_audio():
         bookInfo = db.getBookInfo(book_id)
+        print(bookInfo)
         audioFileName = bookInfo['audioName']   
         print(f"Streaming audio file: {audioFileName}")
         audioFilePath = f'{audioDirectory}\\{audioFileName}.wav'
 
         chunk = getChunkFromMS(audioFilePath, ms)
+        bitrate_kbps = 1411.2  # matches getChunkFromMS
+        bytes_per_ms = (bitrate_kbps * 1000) / 8 / 1000
+        duration_ms = len(chunk) / bytes_per_ms
+        print(f"Chunk duration: {duration_ms/1000:.2f} seconds ({duration_ms/60000:.2f} minutes)")
         yield chunk
+    print(f"Generating audio chunk for book ID: {book_id} at {ms} ms")
+    
+    
 
+    
     return Response(generate_audio(), mimetype='audio/wav')
 
 

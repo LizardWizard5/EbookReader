@@ -15,5 +15,6 @@ description varchar (500),
 pdfName varchar(50) NOT NULL,
 audioName varchar (50) NOT NULL,
 coverName varchar (50) NOT NULL,
+audioLength int NOT NULL,
 PRIMARY KEY (id)
 );
