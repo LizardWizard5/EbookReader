@@ -24,7 +24,6 @@ class connection:
     def getBookInfo(self, book_id):
         self.cursor.execute("SELECT * FROM books WHERE id = %s;", (book_id,))
         res = self.cursor.fetchone()
-        print(res)
         return res
 
     def getBookPaths(self, book_id):

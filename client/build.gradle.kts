@@ -32,13 +32,12 @@ application {
 
 javafx {
     version = "21.0.6"
-    modules = listOf("javafx.controls", "javafx.fxml")
+    modules = listOf("javafx.controls", "javafx.fxml","javafx.media")
 }
 
 dependencies {
     implementation("org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5.1")
     implementation("com.google.code.gson:gson:2.13.2")
 }
 
