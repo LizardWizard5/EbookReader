@@ -1,24 +1,55 @@
 #This file will handle API calls utilizing flask
 #A electron frontend will be used to interact with it. (This was not true.)
+from concurrent.futures import ThreadPoolExecutor
 import os
 import re
 import uuid
 import threading
-from flask import Flask, jsonify, Response, Request, make_response, send_file, stream_with_context,request
-import flask
-from lib.db import connection
-from lib.AudioManager import getRange
+from flask_cors import CORS
+from flask import Flask, jsonify, Response,request
+from lib.SQL.db import connection
+
 import lib.ParseGenerate
 
 #Windows + Linux compatible path handling
 currentDirectory = os.getcwd()
-bookDirectory = currentDirectory + "\\books\\pdf"
-audioDirectory = currentDirectory + "\\books\\audio"
-coverDirectory = currentDirectory + "\\books\\covers"
+baseBookDirectory= os.path.join(currentDirectory, "books")
+bookDirectory= os.path.join(currentDirectory, "books", "pdf")
+audioDirectory = os.path.join(currentDirectory, "books", "audio")
+coverDirectory = os.path.join(currentDirectory, "books", "covers")
 
 #Initialize mySQL connection here
-db = connection(host=os.getenv("HOST"), user=os.getenv("USER"), password=os.getenv("PASSWORD"))
+#Adjust pool size as needed, it is used to handle multiple requests at once. 5 is good for a self hosted system
+if not os.getenv("HOST") or not os.getenv("USER") or not os.getenv("PASSWORD"):
+    print("Database credentials not found in environment variables. Please set HOST, USER, and PASSWORD.")
+    exit(1)
+db = connection(host=os.getenv("HOST"), user=os.getenv("USER"), password=os.getenv("PASSWORD"),pool_size=5)
 
+#Setup cors and flask app
+
+#Pulls ip list from allowedips.txt and returns the list for CORS setup.
+def load_cors_whitelist():
+    if not os.path.exists('allowedips.txt'):
+        print("allowedips.txt not found, server will continue with only allowing localhost")
+        return ["http://localhost"]
+    whitelist = []
+    try:
+        with open('allowedips.txt', 'r') as f:
+            for line in f:
+                if line.startswith("#") or not line.strip():
+                    continue  # Skip comments and empty lines
+                ip = line.strip()
+                if ip:
+                    whitelist.append(f"http://{ip}")
+    except Exception as e:
+        print(f"Error loading CORS whitelist: {e}")
+    return whitelist
+
+app = Flask(__name__)
+CORS(app, origins=load_cors_whitelist(), allow_headers=["Content-Type"])
+
+#Setup threading so that server can handle multiple uploads at once without locking up.
+executor = ThreadPoolExecutor(max_workers=5)  # Create once at startup
 def process_book(fileName, title, author, cover_saved):
     try:
         lib.ParseGenerate.grabAndGenerate(fileName)
@@ -27,24 +58,24 @@ def process_book(fileName, title, author, cover_saved):
     except Exception as e:
         print(f"Error processing book {fileName}: {e}")
 
-app = Flask(__name__)
 BITRATE_KBPS = 64
 BYTES_PER_SEC = (BITRATE_KBPS * 1000) // 8
-#Unimplemented for now.
+
 @app.route('/stream/<book_id>')
 def stream_audio(book_id):
     book = db.getBookInfo(book_id)
-    path = f"{audioDirectory}/{book['audioName']}"
-    
-    if not os.path.exists(path):
+    try:
+        path = os.path.join(audioDirectory, book['audioName'])
+    except Exception as e:
+        print(f"Error retrieving book info for streaming: {e}")
         return "Not Found", 404
+
 
     file_size = os.path.getsize(path)
     range_header = request.headers.get('Range')
 
     # --- PART A: THE HANDSHAKE (No Range Header) ---
     if not range_header:
-        print("DEBUG: Initial Handshake - Sending Accept-Ranges")
         
         def full_file_stream():
             with open(path, 'rb') as f:
@@ -55,9 +86,6 @@ def stream_audio(book_id):
         res.headers['Accept-Ranges'] = 'bytes'
         res.headers['Content-Length'] = str(file_size)
         return res
-
-    # --- PART B: THE SEEK (Range Header Present) ---
-    print(f"DEBUG: Seek Requested! Header: {range_header}")
     match = re.search(r'bytes=(\d+)-(\d*)', range_header)
     if match:
         start = int(match.group(1))
@@ -66,14 +94,18 @@ def stream_audio(book_id):
         chunk_len = (end - start) + 1
 
         def generate_range():
-            with open(path, 'rb') as f:
-                f.seek(start)
-                remaining = chunk_len
-                while remaining > 0:
-                    data = f.read(min(remaining, 64 * 1024))
-                    if not data: break
-                    yield data
-                    remaining -= len(data)
+            try:
+                with open(path, 'rb') as f:
+                    f.seek(start)
+                    remaining = chunk_len
+                    while remaining > 0:
+                        data = f.read(min(remaining, 64 * 1024))
+                        if not data: break
+                        yield data
+                        remaining -= len(data)
+            except Exception as e:
+                print(f"Error streaming audio range: {e}")
+                yield b"Error streaming audio range"
 
         res = Response(generate_range(), status=206, mimetype='audio/mpeg')
         res.headers['Content-Range'] = f'bytes {start}-{end}/{file_size}'
@@ -82,70 +114,74 @@ def stream_audio(book_id):
         return res
 
     return "Invalid Range", 416
-@app.route("/users")
-def users_api():
-    return {"msg":"Hello World!"}
 @app.route("/books/<book_id>")
 def bookInfo_api(book_id):
     book = db.getBookInfo(book_id)
-    return jsonify(book)
+    if book is None:
+        return "Not Found", 404
+    return jsonify(book),200
 @app.route("/books")
 def books_api():
     books = db.getAllBooks()
+    if books is None:
+        return {}, 200
     return jsonify(books)
-
 @app.route("/books/<book_id>/cover")
 def book_cover_api(book_id):
-    cover = db.getBookInfo(book_id)['coverName']
+    cover = db.getBookInfo(book_id)
+    if cover is None:
+        return "Not Found", 404
     #Get image file and return it
-    coverImage = open(f'{currentDirectory}\\books\\covers\\{cover}', 'rb')
+    try:
+        coverImage = open(os.path.join(coverDirectory, cover['coverName']), 'rb')
+    except FileNotFoundError:
+        coverImage = open(os.path.join(currentDirectory, "missingcover.jpg"), 'rb')
     return Response(coverImage, mimetype='image/jpeg')
-
-@app.route("/books/<book_id>/audio")
-def book_audio_api(book_id):
-    audio = db.getBookInfo(book_id)['audioName']
-    #Get audio file and return it
-    audioFile = open(f'{audioDirectory}\\{audio}', 'rb')
-    return Response(audioFile, mimetype='audio/wav')
 @app.route("/books/<book_id>/pdf")
 def book_pdf_api(book_id):
     pdf = db.getBookInfo(book_id)['pdfName']
     #Get pdf file and return it
-    pdfFile = open(f'{bookDirectory}\\{pdf}', 'rb')
+    pdfFile = open(os.path.join(bookDirectory, pdf), 'rb')
+    if pdfFile is None:
+        return "Not Found", 404
     return Response(pdfFile, mimetype='application/pdf')
 
-#Books by a user id commented out until user system is implemented
-"""
-@app.route("/books/<user_id>")
-def user_books_api(user_id):
-    books = db.getUserBooks(user_id)
-    return jsonify(books)
-"""
 #POST request to upload pdf file for parsing and audio generation
 @app.route("/upload", methods=["POST"])
 def upload_pdf():
     #Print post request data for debugging
     try:
-        print(request.form)
-        print(request.files)
+        #Basic validation
+        if 'pdf' not in request.files:
+            return Response("No PDF file part in the request", status=400)
+        if 'title' not in request.form or 'author' not in request.form:
+            return Response("Missing title or author in the form data", status=400)
+        if request.files['pdf'].filename == '':
+            return Response("No selected PDF file", status=400)
+        if request.files['pdf'].content_type != 'application/pdf':
+            return Response("Uploaded file is not a PDF", status=400)
+        if 'cover' in request.files and request.files['cover'].content_type != 'image/jpeg':
+            return Response("Uploaded cover file is not a JPEG image", status=400)
+        if 'cover' in request.files and request.files['cover'].filename == '':
+            return Response("Cover file part is present but no file selected", status=400)
+        
         #Save pdf file to books/pdf directory
         file = request.files['pdf']
         fileName = str(uuid.uuid4())#Generate random uuid for file name to avoid collisions
-        file.save(f"{bookDirectory}\\{fileName}.pdf")
+        file.save(os.path.join(bookDirectory, f"{fileName}.pdf"))
         #Save book cover if it exists
         cover_saved = 'cover' in request.files
         if cover_saved: 
             cover = request.files['cover']
-            cover.save(f"{coverDirectory}\\{fileName}.jpg")
+            cover.save(os.path.join(coverDirectory, f"{fileName}.jpg"))
         #Start background processing
-        threading.Thread(target=process_book, args=(fileName, request.form['title'], request.form['author'], cover_saved)).start()
+        executor.submit(process_book, fileName, request.form['title'], request.form['author'], cover_saved)
 
         return Response("Upload accepted, processing in background", status=200)
     except Exception as e:
         print(f"Error in upload endpoint: {e}")
         return Response("Error processing upload, please ensure all fields are filled appropriately", status=500)
 
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
 

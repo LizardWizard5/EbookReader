@@ -18,8 +18,8 @@ available_device = 'cpu' #Must use cpu in order to utilize threading.
 pipeline = KPipeline(lang_code='a',device=available_device)
 
 currentDirectory = os.getcwd()
-bookDirectory = currentDirectory + "\\books\\pdf"
-audioDirectory = currentDirectory + "\\books\\audio"
+bookDirectory= os.path.join(currentDirectory, "books", "pdf")
+audioDirectory = os.path.join(currentDirectory, "books", "audio")
 
 #Placeholder text for quicker test runs
 globalText = '''
@@ -63,7 +63,7 @@ StartingPage: specifies which page to start reading from useful for skipping tit
 '''
 def getTextFromPDF(fileName):
     print(currentDirectory)
-    reader = PdfReader(bookDirectory + "\\" +fileName+".pdf")
+    reader = PdfReader(os.path.join(bookDirectory, f"{fileName}.pdf"))
     text = ""
     #Read each page's text
     for i in range(0,len(reader.pages)):
@@ -85,8 +85,8 @@ def generateTTS(text,fileName):
     for i, (gs, ps, audio) in enumerate(generator):
         fullAudio.append(audio)
     print(len(fullAudio))
-  
-    sf.write(f'{audioDirectory}\\{fileName}.wav', np.concatenate(fullAudio), 24000)
+    path = os.path.join(audioDirectory, f"{fileName}.wav")
+    sf.write(path, np.concatenate(fullAudio), 24000)
     return f"{fileName}" #Return filename in string format for sql storage
 
 def convert_to_mp3(wav_path, mp3_path):
