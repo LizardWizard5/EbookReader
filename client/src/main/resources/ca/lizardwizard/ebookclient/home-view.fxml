@@ -93,10 +93,15 @@
         </MenuBar>
         <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
             <items>
-            <VBox>
+            <VBox HBox.hgrow="ALWAYS">
                <children>
                   <ListView fx:id="BookList" prefHeight="200.0" prefWidth="200.0" />
-                  <Button fx:id="AddBookButton" mnemonicParsing="false" onAction="#onUploadPdf" styleClass="btn-default" text="Upload PDF" />
+                  <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="AddBookButton" mnemonicParsing="false" onAction="#onUploadPdf" styleClass="btn-default" text="Upload PDF" />
+                        <Button fx:id="RefreshButton" mnemonicParsing="false" onAction="#onRefreshButton" styleClass="btn-default" text="Refresh List" />
+                     </children>
+                  </HBox>
                </children>
             </VBox>
             <VBox alignment="BOTTOM_CENTER" prefHeight="200.0" prefWidth="100.0">
@@ -154,7 +159,7 @@
         </SplitPane>
         <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
             <children>
-                <Label fx:id="statusText" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Left status" HBox.hgrow="ALWAYS">
+                <Label fx:id="statusText" maxHeight="1.7976931348623157E308" maxWidth="-1.0" HBox.hgrow="ALWAYS">
                     <font>
                         <Font size="11.0" fx:id="x3" />
                     </font>

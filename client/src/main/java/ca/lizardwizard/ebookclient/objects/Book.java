@@ -13,8 +13,7 @@ public class Book {
     private String description;
     @SerializedName("coverURL")
     private String coverURL;
-    @SerializedName("audioLength")
-    private long audioLength; // In microseconds
+
 
     public Book(int id, String name, String author, String description, String coverURL) {
         this.id = id;
@@ -62,14 +61,6 @@ public class Book {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public long getAudioLength() {
-        return audioLength;
-    }
-
-    public void setAudioLength(long audioLength) {
-        this.audioLength = audioLength;
     }
 
     @Override

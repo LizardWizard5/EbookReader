@@ -2,19 +2,30 @@
 #A electron frontend will be used to interact with it. (This was not true.)
 import os
 import re
+import uuid
+import threading
 from flask import Flask, jsonify, Response, Request, make_response, send_file, stream_with_context,request
 import flask
 from lib.db import connection
 from lib.AudioManager import getRange
-
+import lib.ParseGenerate
 
 #Windows + Linux compatible path handling
 currentDirectory = os.getcwd()
 bookDirectory = currentDirectory + "\\books\\pdf"
 audioDirectory = currentDirectory + "\\books\\audio"
+coverDirectory = currentDirectory + "\\books\\covers"
 
 #Initialize mySQL connection here
 db = connection(host=os.getenv("HOST"), user=os.getenv("USER"), password=os.getenv("PASSWORD"))
+
+def process_book(fileName, title, author, cover_saved):
+    try:
+        lib.ParseGenerate.grabAndGenerate(fileName)
+        cover_name = f"{fileName}.jpg" if cover_saved else ""
+        db.createBookEntry(title, author, f"{fileName}.pdf", f"{fileName}.mp3", 0, cover_name)
+    except Exception as e:
+        print(f"Error processing book {fileName}: {e}")
 
 app = Flask(__name__)
 BITRATE_KBPS = 64
@@ -23,7 +34,7 @@ BYTES_PER_SEC = (BITRATE_KBPS * 1000) // 8
 @app.route('/stream/<book_id>')
 def stream_audio(book_id):
     book = db.getBookInfo(book_id)
-    path = f"{audioDirectory}/{book['audioName']}.mp3"
+    path = f"{audioDirectory}/{book['audioName']}"
     
     if not os.path.exists(path):
         return "Not Found", 404
@@ -113,10 +124,28 @@ def user_books_api(user_id):
 #POST request to upload pdf file for parsing and audio generation
 @app.route("/upload", methods=["POST"])
 def upload_pdf():
-    pass
+    #Print post request data for debugging
+    try:
+        print(request.form)
+        print(request.files)
+        #Save pdf file to books/pdf directory
+        file = request.files['pdf']
+        fileName = str(uuid.uuid4())#Generate random uuid for file name to avoid collisions
+        file.save(f"{bookDirectory}\\{fileName}.pdf")
+        #Save book cover if it exists
+        cover_saved = 'cover' in request.files
+        if cover_saved: 
+            cover = request.files['cover']
+            cover.save(f"{coverDirectory}\\{fileName}.jpg")
+        #Start background processing
+        threading.Thread(target=process_book, args=(fileName, request.form['title'], request.form['author'], cover_saved)).start()
+
+        return Response("Upload accepted, processing in background", status=200)
+    except Exception as e:
+        print(f"Error in upload endpoint: {e}")
+        return Response("Error processing upload, please ensure all fields are filled appropriately", status=500)
 
 
 if __name__ == "__main__":
-    print(flask.__version__)
     app.run(debug=True)
 

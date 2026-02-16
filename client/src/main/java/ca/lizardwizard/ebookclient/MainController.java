@@ -65,16 +65,8 @@ public class MainController implements Initializable {
     private Text NowListeningText;
 
     @FXML
-    private Text DebugText;
-
-    @FXML
     private Text timeText;
 
-    @FXML
-    private Font x3;
-
-    @FXML
-    private Color x4;
 
     @FXML
     private MediaPlayer mediaPlayer;
@@ -93,6 +85,7 @@ public class MainController implements Initializable {
                 mediaPlayer = new MediaPlayer(media);
                 //Setup UI
                 NowListeningText.setText("Now Listening to "+currentBook.getName() +"\nBy " + currentBook.getAuthor());
+                statusText.setText("Now Listening to "+currentBook.getName() +" By " + currentBook.getAuthor());
                 DetailsBookImage.setImage(new Image("http://localhost:5000/books/"+currentBook.getId()+"/cover"));
                 DetailsBookImage.setOpacity(1);
                 NowListeningText.setOpacity(1);
@@ -126,13 +119,17 @@ public class MainController implements Initializable {
 
 
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             System.out.println("error detected when initializing MainController");
             throw new RuntimeException(e);
         }
     }
 
-
+    @FXML
+    protected void onRefreshButton(ActionEvent e) throws IOException {
+        BookList.getItems().clear();
+        BookList.getItems().addAll(ApiCalls.getBooks());
+    }
     @FXML
     protected void onPlayButton(){
 

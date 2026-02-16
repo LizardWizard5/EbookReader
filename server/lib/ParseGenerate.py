@@ -79,14 +79,13 @@ Future additions: voice choice, language
 Generates wav file from text passed in
 text: Text to be spoken
 """
-def generateTTS(text):
+def generateTTS(text,fileName):
     generator = pipeline(text, voice='af_heart')
     fullAudio = []
     for i, (gs, ps, audio) in enumerate(generator):
         fullAudio.append(audio)
     print(len(fullAudio))
-    #Generate UUID for audio files name
-    fileName = uuid.uuid4()
+  
     sf.write(f'{audioDirectory}\\{fileName}.wav', np.concatenate(fullAudio), 24000)
     return f"{fileName}" #Return filename in string format for sql storage
 
@@ -98,10 +97,10 @@ def convert_to_mp3(wav_path, mp3_path):
     except Exception as e:
         print(f"Error during wav->mp3 conversion: {e}")
 
-def grabAndGenerate(pdfName):
-    text = getTextFromPDF(pdfName)
+def grabAndGenerate(fileName):
+    text = getTextFromPDF(fileName)
     print("Extracted text from pdf:")
     print(text[0:500])#Print first 500 characters for testing
-    fileName = generateTTS(text)
+    generateTTS(text,fileName)
     convert_to_mp3(f'{audioDirectory}\\{fileName}.wav',f'{audioDirectory}\\{fileName}.mp3')
-    return fileName#Return filename for sql
+   

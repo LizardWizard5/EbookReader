@@ -17,6 +17,7 @@ module ca.lizardwizard.ebookclient {
     opens ca.lizardwizard.ebookclient to javafx.fxml;
     exports ca.lizardwizard.ebookclient;
     exports ca.lizardwizard.ebookclient.Lib;
+    exports ca.lizardwizard.ebookclient.objects;
     opens ca.lizardwizard.ebookclient.Lib to javafx.fxml;
     opens ca.lizardwizard.ebookclient.objects to com.google.gson;
 }

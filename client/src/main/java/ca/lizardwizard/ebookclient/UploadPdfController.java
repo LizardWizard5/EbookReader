@@ -1,5 +1,6 @@
 package ca.lizardwizard.ebookclient;
 
+import ca.lizardwizard.ebookclient.Lib.ApiCalls;
 import ca.lizardwizard.ebookclient.Lib.SceneUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,6 +12,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -41,8 +43,11 @@ public class UploadPdfController implements Initializable {
     }
 
     @FXML
-    void submitButton(ActionEvent event) {
-        
+    void submitButton(ActionEvent event) throws IOException {
+        String title = titleBox.getText();
+        String author = authorBox.getText();
+        String details = detailBox.getText();
+        ApiCalls.postBook(title, author, details, selectedPng, selectedPdf);
     }
 
     @FXML
