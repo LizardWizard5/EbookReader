@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import re
 import uuid
-import threading
 from flask_cors import CORS
 from flask import Flask, jsonify, Response,request
 from lib.SQL.db import connection
