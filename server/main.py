@@ -104,7 +104,7 @@ def stream_audio(book_id):
                         remaining -= len(data)
             except Exception as e:
                 print(f"Error streaming audio range: {e}")
-                yield b"Error streaming audio range"
+                yield b"Error streaming audio"
 
         res = Response(generate_range(), status=206, mimetype='audio/mpeg')
         res.headers['Content-Range'] = f'bytes {start}-{end}/{file_size}'
@@ -117,19 +117,19 @@ def stream_audio(book_id):
 def bookInfo_api(book_id):
     book = db.getBookInfo(book_id)
     if book is None:
-        return "Not Found", 404
+        return Response("{}", 200)
     return jsonify(book),200
 @app.route("/books")
 def books_api():
     books = db.getAllBooks()
     if books is None:
-        return {}, 200
+        return Response("{}", 200)
     return jsonify(books)
 @app.route("/books/<book_id>/cover")
 def book_cover_api(book_id):
     cover = db.getBookInfo(book_id)
     if cover is None:
-        return "Not Found", 404
+        return Response("Not Found", 404)
     #Get image file and return it
     try:
         coverImage = open(os.path.join(coverDirectory, cover['coverName']), 'rb')
@@ -142,7 +142,7 @@ def book_pdf_api(book_id):
     #Get pdf file and return it
     pdfFile = open(os.path.join(bookDirectory, pdf), 'rb')
     if pdfFile is None:
-        return "Not Found", 404
+        return Response("Not Found", 404)
     return Response(pdfFile, mimetype='application/pdf')
 
 #POST request to upload pdf file for parsing and audio generation

@@ -1,5 +1,5 @@
-CREATE DATABASE ebookReader;
-USE ebookReader;
+CREATE DATABASE ebookreader;
+USE ebookreader;
 CREATE TABLE people(
 id int AUTO_INCREMENT,
 name varchar(50) NOT NULL,
