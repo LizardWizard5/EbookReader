@@ -45,6 +45,7 @@ def load_cors_whitelist():
     return whitelist
 
 app = Flask(__name__)
+print(f"CORS whitelist added: {len(load_cors_whitelist())} entries")
 CORS(app, origins=load_cors_whitelist(), allow_headers=["Content-Type"])
 
 #Setup threading so that server can handle multiple uploads at once without locking up.
@@ -182,5 +183,8 @@ def upload_pdf():
         return Response("Error processing upload, please ensure all fields are filled appropriately", status=500)
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    if os.getenv("IP") is None or os.getenv("PORT") is None:
+        print("IP and PORT environment variables not set. Please set IP and PORT in the .env file.")
+        exit(1)
+    app.run(host=os.getenv("IP"), port=os.getenv("PORT"), debug=False)
 

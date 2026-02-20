@@ -13,6 +13,8 @@ Created with the purpose of escaping the need to actually read my history essay 
 	* HOST: mySQL database hostname
 	* USER: mySQL database username
 	* PASSWORD: mySQL database password
+	* PORT: Desired port to run on
+	* HOST: Desired host to run on
 * Create a **allowedips.txt** file that contains a list of ips you will allow the server to interact with
 
 
