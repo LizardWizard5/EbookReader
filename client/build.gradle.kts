@@ -8,12 +8,11 @@
 
 group = "ca.lizardwizard"
 version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
 
-val junitVersion = "5.12.1"
+
 
 java {
     toolchain {
@@ -36,15 +35,12 @@ javafx {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementation("org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.5.1")
     implementation("com.google.code.gson:gson:2.13.2")
-}
 
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
-
 jlink {
     imageZip.set(layout.buildDirectory.file("/distributions/app-${javafx.platform.classifier}.zip"))
     options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))

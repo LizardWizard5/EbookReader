@@ -145,12 +145,8 @@ public class MainController implements Initializable {
 
     }
 
-
     @FXML
     protected void onRewindButton(){
-
-
-
         Duration cTime = mediaPlayer.getCurrentTime();
         Duration newTime = cTime.subtract(Duration.seconds(10));
         if(newTime.lessThan(Duration.seconds(0)))

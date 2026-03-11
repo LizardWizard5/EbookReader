@@ -18,9 +18,9 @@ import java.util.ResourceBundle;
 
 public class UploadPdfController implements Initializable {
     private FileChooser pdfChooser = new FileChooser();
-    private FileChooser pngChooser = new FileChooser();
+    private FileChooser jpegChooser = new FileChooser();
     private File selectedPdf;
-    private File selectedPng;
+    private File selectedJpeg;
     @FXML
     private TextField authorBox;
 
@@ -35,7 +35,7 @@ public class UploadPdfController implements Initializable {
 
         Node sourceNode = (Node) event.getSource();
         Stage stage = (Stage) sourceNode.getScene().getWindow();
-        selectedPng = pngChooser.showOpenDialog(stage);
+        selectedJpeg = jpegChooser.showOpenDialog(stage);
     }
     @FXML
     void returnButton(ActionEvent event) {
@@ -47,7 +47,7 @@ public class UploadPdfController implements Initializable {
         String title = titleBox.getText();
         String author = authorBox.getText();
         String details = detailBox.getText();
-        ApiCalls.postBook(title, author, details, selectedPng, selectedPdf);
+        ApiCalls.postBook(title, author, details, selectedJpeg, selectedPdf);
     }
 
     @FXML
@@ -63,8 +63,8 @@ public class UploadPdfController implements Initializable {
         pdfChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
         );
-        pngChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PNG Files", "*.png")
+        jpegChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JPG Files", "*.jpg", "*.jpeg")
         );
 
     }

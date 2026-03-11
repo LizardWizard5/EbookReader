@@ -4,7 +4,6 @@ import ca.lizardwizard.ebookclient.objects.Book;
 import com.google.gson.Gson;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -12,8 +11,8 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,7 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 //TODO: For all methods, I want to add UI error feedback instead of just force closing.
 public class ApiCalls {
-    private static String baseUrl = "http://127.0.0.1:5000"; // Base URL for Python flask server
+    private static String baseUrl = "http://127.0.0.1:8000"; // Base URL for Python flask server
     /**
      * Pulls data from server
      * @return Book[] an array of books
@@ -72,14 +71,26 @@ public class ApiCalls {
                     .addTextBody("title", title, ContentType.TEXT_PLAIN)
                     .addTextBody("author", author, ContentType.TEXT_PLAIN)
                     .addTextBody("description", desc, ContentType.TEXT_PLAIN)
-                    .addBinaryBody("cover", cover, ContentType.create("image/png"), cover.getName())
-                    .addBinaryBody("pdf", pdf, ContentType.APPLICATION_OCTET_STREAM, pdf.getName())
+                    .addBinaryBody("cover", cover, ContentType.create("image/jpeg"), cover.getName())
+                    .addBinaryBody("pdf", pdf, ContentType.create("application/pdf"), pdf.getName())
                     .build();
             post.setEntity(entity);
             try (CloseableHttpResponse res = client.execute(post)) {
                 if (res.getCode() != 200) {
-                    throw new IOException("Error: API books request failed with code " + res.getCode());
+                    // Read response body (if any) and include it in the error message so callers can see API error details
+                    HttpEntity resEntity = res.getEntity();
+                    String respBody = "";
+                    if (resEntity != null) {
+                        respBody = EntityUtils.toString(resEntity);
+                    }
+                    String msg = "Error: API books request failed with code " + res.getCode();
+                    if (!respBody.isEmpty()) {
+                        msg += " - " + respBody;
+                    }
+                    throw new IOException(msg);
                 }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
             }
         }
         return true;

@@ -186,5 +186,6 @@ if __name__ == "__main__":
     if os.getenv("IP") is None or os.getenv("PORT") is None:
         print("IP and PORT environment variables not set. Please set IP and PORT in the .env file.")
         exit(1)
+        
     app.run(host=os.getenv("IP"), port=os.getenv("PORT"), debug=False)
 
