@@ -67,6 +67,20 @@ public class EnvReader<T> {
 
         return true;
     }
+    public boolean checkIfKeyExists(String key) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (line.startsWith("#")) {
+                continue;
+            }
+            String[] parts = line.split(":");
+            if (parts.length == 2 && parts[0].trim().equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean checkIfFileExists(){
         File f = new File(path);
