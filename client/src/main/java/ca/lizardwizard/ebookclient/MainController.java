@@ -2,6 +2,7 @@ package ca.lizardwizard.ebookclient;
 
 import ca.lizardwizard.ebookclient.Lib.ApiCalls;
 import ca.lizardwizard.ebookclient.Lib.AudioPlayer;
+import ca.lizardwizard.ebookclient.Lib.Popup;
 import ca.lizardwizard.ebookclient.Lib.SceneUtil;
 import ca.lizardwizard.ebookclient.objects.Book;
 
@@ -167,6 +168,13 @@ public class MainController implements Initializable {
     @FXML
     protected void onUploadPdf(ActionEvent e) throws IOException {
         switchScenes(e,"upload-pdf");
+
+    }
+
+    @FXML
+    protected void onTestPopup(ActionEvent e) throws IOException {
+        Popup popup = new Popup("Test popup","TEST ERROR", "This is a test error.", "Huh?");
+        popup.createPopup();
 
     }
 

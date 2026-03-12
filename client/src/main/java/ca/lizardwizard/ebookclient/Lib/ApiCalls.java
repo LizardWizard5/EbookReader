@@ -22,7 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 //TODO: For all methods, I want to add UI error feedback instead of just force closing.
 public class ApiCalls {
-    private static String baseUrl = "http://127.0.0.1:8000"; // Base URL for Python flask server
+    private static String baseUrl = "http://10.0.0.3:8000"; // Base URL for Python flask server
     /**
      * Pulls data from server
      * @return Book[] an array of books
