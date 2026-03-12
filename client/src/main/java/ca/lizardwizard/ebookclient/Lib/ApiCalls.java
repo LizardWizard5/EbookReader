@@ -87,10 +87,11 @@ public class ApiCalls {
                     if (!respBody.isEmpty()) {
                         msg += " - " + respBody;
                     }
-                    throw new IOException(msg);
+                    new Popup("Error!","Error uploading book", "An error occurred when trying to create your book please refer to the following message","Ok",msg);
                 }
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                new Popup("Error!","Error uploading book", "An error occurred when trying to create your book please refer to the following message","Ok",e.getMessage());
+
             }
         }
         return true;
@@ -111,7 +112,8 @@ public class ApiCalls {
 
         int responseCode = conn.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_PARTIAL) {
-            throw new IOException("Failed to download audio, HTTP code: " + responseCode);
+
+            new Popup("Error","Error "+responseCode,"An error occurred when pulling audio, If you are the administration, please check server status","Ok");
         }
 
         try (InputStream in = conn.getInputStream();

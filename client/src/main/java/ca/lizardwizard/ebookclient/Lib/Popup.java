@@ -23,12 +23,14 @@ public class Popup {
         this.windowTitle = windowTitle;
         this.headerText = headerText;
         this.contentText = contentText;
+        this.createPopup();
     }
     public Popup(String windowTitle, String headerText, String contentText, String dismissText){
         this.windowTitle = windowTitle;
         this.headerText = headerText;
         this.contentText = contentText;
         this.dismissText = dismissText;
+        this.createPopup();
     }
     public Popup(String windowTitle, String headerText, String contentText, String dismissText, String advancedDetails){
         this.windowTitle = windowTitle;
@@ -36,6 +38,7 @@ public class Popup {
         this.contentText = contentText;
         this.dismissText = dismissText;
         this.advancedDetails = advancedDetails;
+        this.createPopup();
     }
 
     public void createPopup() {

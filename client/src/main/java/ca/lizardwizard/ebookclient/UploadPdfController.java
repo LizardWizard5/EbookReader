@@ -1,6 +1,7 @@
 package ca.lizardwizard.ebookclient;
 
 import ca.lizardwizard.ebookclient.Lib.ApiCalls;
+import ca.lizardwizard.ebookclient.Lib.Popup;
 import ca.lizardwizard.ebookclient.Lib.SceneUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -47,7 +48,10 @@ public class UploadPdfController implements Initializable {
         String title = titleBox.getText();
         String author = authorBox.getText();
         String details = detailBox.getText();
-        ApiCalls.postBook(title, author, details, selectedJpeg, selectedPdf);
+        Boolean res = ApiCalls.postBook(title, author, details, selectedJpeg, selectedPdf);
+        if(res){
+            new Popup("Success!","Book upload complete", "Please allow a few hours depending on book length for the server to fully process the audio conversion"," I Understand");
+        }
     }
 
     @FXML

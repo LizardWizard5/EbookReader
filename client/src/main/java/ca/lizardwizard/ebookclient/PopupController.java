@@ -32,7 +32,7 @@ public class PopupController implements Initializable {
     private void updateView() {
 
         if (popup == null || titleText == null || messageText == null || advancedText == null) {
-            
+
             return;
         }
 

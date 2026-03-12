@@ -122,6 +122,7 @@ public class MainController implements Initializable {
 
         } catch (IOException e) {
             System.out.println("error detected when initializing MainController");
+            new Popup("Error!","Error Unknown","An error has occurred at an early stage in starting the application, it's best to restart.","Ok","Contact server administration or open a git issue with the following error:\n"+e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -174,7 +175,7 @@ public class MainController implements Initializable {
     @FXML
     protected void onTestPopup(ActionEvent e) throws IOException {
         Popup popup = new Popup("Test popup","TEST ERROR", "This is a test error.", "Huh?");
-        popup.createPopup();
+        //popup.createPopup();
 
     }
 
