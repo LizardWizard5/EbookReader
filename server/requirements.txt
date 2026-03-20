@@ -6,4 +6,3 @@ transformers==4.57.3
 soundfile==0.13.1
 kokoro==0.9.4
 spacy==3.8.0
-pydub==0.25.1

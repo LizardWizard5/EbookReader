@@ -7,7 +7,7 @@ import numpy as np
 from kokoro import KPipeline
 from transformers import pipeline
 import subprocess
-from pydub import AudioSegment
+
 
 available_device = 'cpu' #Must use cpu in order to utilize threading.
 
@@ -88,7 +88,7 @@ def generateTTS(text,fileName):
 def convert_to_mp3(wav_path, mp3_path):
     # -ac 1: Mono, -ar 24000: Sample rate, -ab 64k: Bitrate
     try:
-        AudioSegment.from_wav(wav_path).export(mp3_path, format="mp3")
+        subprocess.run(['lame', wav_path, mp3_path], check=True)
         #subprocess.run(['ffmpeg', '-i', wav_path, '-ac', '1', '-ar', '24000', '-ab', '64k', mp3_path])
         os.remove(wav_path)  # Remove the original WAV file after conversion
     except Exception as e:
