@@ -101,5 +101,5 @@ def grabAndGenerate(fileName):
     print("Extracted text from pdf:")
     print(text[0:500])#Print first 500 characters for testing
     generateTTS(text,fileName)
-    convert_to_mp3(f'{audioDirectory}\\{fileName}.wav',f'{audioDirectory}\\{fileName}.mp3')
+    convert_to_mp3(os.path.join(audioDirectory,f"{fileName}.wav"),os.path.join(audioDirectory,f"{fileName}.mp3"))
    

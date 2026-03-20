@@ -75,14 +75,25 @@ public class ApiCalls {
         String port = new EnvReader<String>().readVar("PORT");
         String baseUrl = "http://" + host + ":" + port;
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            HttpPost post = new HttpPost(baseUrl+":"+port + "/upload");
-            HttpEntity entity = MultipartEntityBuilder.create()
-                    .addTextBody("title", title, ContentType.TEXT_PLAIN)
-                    .addTextBody("author", author, ContentType.TEXT_PLAIN)
-                    .addTextBody("description", desc, ContentType.TEXT_PLAIN)
-                    .addBinaryBody("cover", cover, ContentType.create("image/jpeg"), cover.getName())
-                    .addBinaryBody("pdf", pdf, ContentType.create("application/pdf"), pdf.getName())
-                    .build();
+            HttpPost post = new HttpPost(baseUrl+ "/upload");
+            HttpEntity entity;
+            if(cover!=null) {
+                entity = MultipartEntityBuilder.create()
+                        .addTextBody("title", title, ContentType.TEXT_PLAIN)
+                        .addTextBody("author", author, ContentType.TEXT_PLAIN)
+                        .addTextBody("description", desc, ContentType.TEXT_PLAIN)
+                        .addBinaryBody("cover", cover, ContentType.create("image/jpeg"), cover.getName())
+                        .addBinaryBody("pdf", pdf, ContentType.create("application/pdf"), pdf.getName())
+                        .build();
+            }
+            else{
+                entity = MultipartEntityBuilder.create()
+                        .addTextBody("title", title, ContentType.TEXT_PLAIN)
+                        .addTextBody("author", author, ContentType.TEXT_PLAIN)
+                        .addTextBody("description", desc, ContentType.TEXT_PLAIN)
+                        .addBinaryBody("pdf", pdf, ContentType.create("application/pdf"), pdf.getName())
+                        .build();
+            }
             post.setEntity(entity);
             try (CloseableHttpResponse res = client.execute(post)) {
                 if (res.getCode() != 200) {

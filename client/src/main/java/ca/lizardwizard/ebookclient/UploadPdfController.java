@@ -48,7 +48,14 @@ public class UploadPdfController implements Initializable {
         String title = titleBox.getText();
         String author = authorBox.getText();
         String details = detailBox.getText();
-        Boolean res = ApiCalls.postBook(title, author, details, selectedJpeg, selectedPdf);
+
+        if(selectedPdf == null) {
+            new Popup("Error","Book Upload Failed","Please Select a Book To Upload","Ok");
+            return;
+        }
+
+        boolean res = ApiCalls.postBook(title, author, details, selectedJpeg, selectedPdf);
+
         if(res){
             new Popup("Success!","Book upload complete", "Please allow a few hours depending on book length for the server to fully process the audio conversion"," I Understand");
         }
