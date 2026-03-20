@@ -22,7 +22,7 @@
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  A PARTICULAR PURPOSEc ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
@@ -50,9 +50,11 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.lizardwizard.ebookclient.MainController">
+<VBox prefHeight="600.0" prefWidth="900.0" styleClass="root-container" stylesheets="@style.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.lizardwizard.ebookclient.MainController">
     <children>
-        <MenuBar VBox.vgrow="NEVER">
+
+        <!-- ── Menu Bar ── -->
+        <MenuBar styleClass="app-menubar" VBox.vgrow="NEVER">
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
@@ -91,76 +93,126 @@
                 </Menu>
             </menus>
         </MenuBar>
-        <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+
+        <!-- ── Main Three-Panel Split ── -->
+        <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512"
+                   focusTraversable="true"
+                   styleClass="main-split"
+                   prefHeight="-1.0" prefWidth="-1.0"
+                   VBox.vgrow="ALWAYS">
             <items>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <ListView fx:id="BookList" prefHeight="200.0" prefWidth="200.0" />
-                  <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <Button fx:id="AddBookButton" mnemonicParsing="false" onAction="#onUploadPdf" styleClass="btn-default" text="Upload PDF" />
-                        <Button fx:id="RefreshButton" mnemonicParsing="false" onAction="#onRefreshButton" styleClass="btn-default" text="Refresh List" />
-                        <Button mnemonicParsing="false" onAction="#onTestPopup" text="TestPopup" />
-                     </children>
-                  </HBox>
-               </children>
-            </VBox>
-            <VBox alignment="BOTTOM_CENTER" prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Text fx:id="timeText" strokeType="OUTSIDE" strokeWidth="0.0" text="00:00:00/00:00:00 (0% Completed)" textAlignment="CENTER" wrappingWidth="241.25390625">
-                           <VBox.margin>
-                              <Insets left="100.0" />
-                           </VBox.margin>
-                        </Text>
-                        <HBox alignment="TOP_CENTER" prefHeight="20.0" prefWidth="443.0">
-                           <children>
-                              <Button fx:id="rewindButton" disable="true" mnemonicParsing="false" onAction="#onRewindButton" text="-10s" />
-                              <Slider fx:id="audioTimeline" blockIncrement="0.01" disable="true" minWidth="250.0" prefHeight="14.0" prefWidth="338.0">
-                                 <HBox.margin>
-                                    <Insets left="5.0" right="5.0" top="5.0" />
-                                 </HBox.margin>
-                              </Slider>
-                              <Button fx:id="fastForwardButton" disable="true" mnemonicParsing="false" onAction="#onFastForwardButton" text="+10s" />
-                           </children>
+
+                <!-- ── Left Panel: Library ── -->
+                <VBox styleClass="panel-library" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="My Library" styleClass="panel-title">
+                            <VBox.margin>
+                                <Insets top="16.0" left="14.0" bottom="8.0" />
+                            </VBox.margin>
+                        </Label>
+                        <ListView fx:id="BookList" styleClass="book-list" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                        <HBox alignment="CENTER" spacing="8.0" styleClass="library-actions">
+                            <children>
+                                <Button fx:id="AddBookButton" mnemonicParsing="false" onAction="#onUploadPdf" styleClass="btn-primary" text="＋ Upload PDF" />
+                                <Button fx:id="RefreshButton" mnemonicParsing="false" onAction="#onRefreshButton" styleClass="btn-secondary" text="↻ Refresh" />
+                                <Button mnemonicParsing="false" onAction="#onTestPopup" styleClass="btn-ghost" text="Test" />
+                            </children>
+                            <padding>
+                                <Insets top="12.0" bottom="12.0" left="10.0" right="10.0" />
+                            </padding>
                         </HBox>
-                        <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
-                           <children>
-                              <Button fx:id="playButton" disable="true" mnemonicParsing="false" onAction="#onPlayButton" text="Pause" />
-                           </children>
+                    </children>
+                </VBox>
+
+                <!-- ── Centre Panel: Player ── -->
+                <VBox alignment="CENTER" styleClass="panel-player" prefHeight="200.0" prefWidth="100.0">
+                    <children>
+                        <VBox alignment="CENTER" spacing="10.0" styleClass="player-card" prefWidth="420.0">
+                            <children>
+                                <!-- Time display -->
+                                <Text fx:id="timeText"
+                                      styleClass="time-text"
+                                      strokeType="OUTSIDE" strokeWidth="0.0"
+                                      text="00:00:00 / 00:00:00  ·  0% Completed"
+                                      textAlignment="CENTER"
+                                      wrappingWidth="380.0" />
+
+                                <!-- Scrub bar row -->
+                                <HBox alignment="CENTER" spacing="10.0" prefHeight="36.0">
+                                    <children>
+                                        <Button fx:id="rewindButton" disable="true" mnemonicParsing="false"
+                                                onAction="#onRewindButton" styleClass="btn-transport"
+                                                text="⏮  −10s" />
+                                        <Slider fx:id="audioTimeline" blockIncrement="0.01" disable="true"
+                                                minWidth="200.0" prefHeight="14.0" prefWidth="240.0"
+                                                styleClass="audio-slider">
+                                            <HBox.margin>
+                                                <Insets top="4.0" />
+                                            </HBox.margin>
+                                        </Slider>
+                                        <Button fx:id="fastForwardButton" disable="true" mnemonicParsing="false"
+                                                onAction="#onFastForwardButton" styleClass="btn-transport"
+                                                text="+10s  ⏭" />
+                                    </children>
+                                </HBox>
+
+                                <!-- Play/Pause -->
+                                <HBox alignment="CENTER">
+                                    <children>
+                                        <Button fx:id="playButton" disable="true" mnemonicParsing="false"
+                                                onAction="#onPlayButton" styleClass="btn-play"
+                                                text="⏸  Pause" />
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="6.0" bottom="6.0" />
+                                    </VBox.margin>
+                                </HBox>
+                            </children>
+                            <padding>
+                                <Insets top="24.0" bottom="24.0" left="24.0" right="24.0" />
+                            </padding>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <!-- ── Right Panel: Book Details ── -->
+                <VBox alignment="TOP_CENTER" styleClass="panel-details" prefHeight="511.0" prefWidth="221.0">
+                    <children>
+                        <HBox prefHeight="30.0" prefWidth="200.0">
+                            <children>
+                                <Label text="Book Details" styleClass="panel-title" />
+                            </children>
+                            <VBox.margin>
+                                <Insets left="14.0" top="16.0" bottom="12.0" />
+                            </VBox.margin>
                         </HBox>
-                     </children>
-                  </VBox>
-               </children>
-            </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="511.0" prefWidth="221.0">
-                      <children>
-                  <HBox prefHeight="30.0" prefWidth="200.0">
-                     <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Book details">
-                           <font>
-                              <Font size="25.0" />
-                           </font>
-                        </Text>
-                     </children>
-                     <VBox.margin>
-                        <Insets left="5.0" top="10.0" />
-                     </VBox.margin>
-                  </HBox>
-                          <ImageView fx:id="DetailsBookImage" fitHeight="253.0" fitWidth="200.0" opacity="0.0" pickOnBounds="true" preserveRatio="true">
-                              <VBox.margin>
-                                  <Insets top="10.0" />
-                              </VBox.margin>
-                          </ImageView>
-                  <Text fx:id="NowListeningText" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                      </children>
-                  </VBox>
+
+                        <ImageView fx:id="DetailsBookImage"
+                                   fitHeight="253.0" fitWidth="190.0"
+                                   opacity="0.0"
+                                   pickOnBounds="true" preserveRatio="true"
+                                   styleClass="book-cover">
+                            <VBox.margin>
+                                <Insets top="8.0" bottom="14.0" />
+                            </VBox.margin>
+                        </ImageView>
+
+                        <Text fx:id="NowListeningText"
+                              opacity="0.0"
+                              strokeType="OUTSIDE" strokeWidth="0.0"
+                              styleClass="now-listening-text"
+                              text="Text" />
+                    </children>
+                </VBox>
+
             </items>
         </SplitPane>
-        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
+
+        <!-- ── Status Bar ── -->
+        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" styleClass="status-bar" VBox.vgrow="NEVER">
             <children>
-                <Label fx:id="statusText" maxHeight="1.7976931348623157E308" maxWidth="-1.0" HBox.hgrow="ALWAYS">
+                <Label fx:id="statusText" maxHeight="1.7976931348623157E308" maxWidth="-1.0"
+                       styleClass="status-label" HBox.hgrow="ALWAYS">
                     <font>
                         <Font size="11.0" fx:id="x3" />
                     </font>
@@ -169,11 +221,13 @@
                     </textFill>
                 </Label>
                 <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-                <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4" HBox.hgrow="NEVER" />
+                <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4"
+                       styleClass="status-label" HBox.hgrow="NEVER" />
             </children>
             <padding>
-                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                <Insets bottom="4.0" left="10.0" right="10.0" top="4.0" />
             </padding>
         </HBox>
+
     </children>
 </VBox>

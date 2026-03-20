@@ -22,7 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 //TODO: For all methods, I want to add UI error feedback instead of just force closing.
 public class ApiCalls {
-    private static String baseUrl = "http://10.0.0.3:8000"; // Base URL for Python flask server
+
     /**
      * Pulls data from server
      * @return Book[] an array of books
@@ -30,8 +30,11 @@ public class ApiCalls {
      * @throws InterruptedException
      */
     public static Book[] getBooks() throws IOException {
+        String host = new EnvReader<String>().readVar("HOST");
+        String port = new EnvReader<String>().readVar("PORT");
+        String baseUrl = "http://" + host + ":" + port;
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-            return httpClient.execute(new HttpGet(baseUrl + "/books"),
+            return httpClient.execute(new HttpGet(baseUrl+"/books"),
                     response -> {
                         if (response.getCode() != 200) {
                             throw new IOException("Error: API books request failed with code " + response.getCode());
@@ -47,8 +50,11 @@ public class ApiCalls {
     }
 
     public static Book getBook(int id) throws IOException {
+        String host = new EnvReader<String>().readVar("HOST");
+        String port = new EnvReader<String>().readVar("PORT");
+        String baseUrl = "http://" + host + ":" + port;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(new HttpGet(baseUrl+"/books/"+id),
+        return httpClient.execute(new HttpGet(baseUrl+":"+port+"/books/"+id),
                 response->{
                     if(response.getCode()!=200){
                         throw new IOException("Error: API books request failed with code "+response.getCode());
@@ -65,8 +71,11 @@ public class ApiCalls {
 
 
     public static Boolean postBook(String title, String author, String desc, File cover, File pdf) throws IOException {
+        String host = new EnvReader<String>().readVar("HOST");
+        String port = new EnvReader<String>().readVar("PORT");
+        String baseUrl = "http://" + host + ":" + port;
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            HttpPost post = new HttpPost(baseUrl + "/upload");
+            HttpPost post = new HttpPost(baseUrl+":"+port + "/upload");
             HttpEntity entity = MultipartEntityBuilder.create()
                     .addTextBody("title", title, ContentType.TEXT_PLAIN)
                     .addTextBody("author", author, ContentType.TEXT_PLAIN)
@@ -105,7 +114,10 @@ public class ApiCalls {
      * @throws IOException
      */
     public static byte[] downloadAudioToMemory(int bookId,long ms) throws IOException {
-        String urlStr = baseUrl + "/stream_audio/" + bookId;
+        String host = new EnvReader<String>().readVar("HOST");
+        String port = new EnvReader<String>().readVar("PORT");
+        String baseUrl = "http://" + host + ":" + port;
+        String urlStr = baseUrl+ "/stream_audio/" + bookId;
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
