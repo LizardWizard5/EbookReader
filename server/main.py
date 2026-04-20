@@ -146,6 +146,21 @@ def book_pdf_api(book_id):
         return Response("Not Found", 404)
     return Response(pdfFile, mimetype='application/pdf')
 
+@app.route("/books/recently_listened")
+def recently_listened_api():
+    recently_listened = db.getRecentlyListened()
+    if recently_listened is None:
+        return Response("{}", 200)
+    return jsonify(recently_listened),200
+@app.route("/books/<book_id>/update_recently_listened", methods=["POST"])
+def update_recently_listened_api(book_id):
+    try:
+        db.updateRecentlyListened(book_id)
+        return Response("Updated recently listened", 200)
+    except Exception as e:
+        print(f"Error updating recently listened: {e}")
+        return Response("Error updating recently listened", 500)
+    
 #POST request to upload pdf file for parsing and audio generation
 @app.route("/upload", methods=["POST"])
 def upload_pdf():

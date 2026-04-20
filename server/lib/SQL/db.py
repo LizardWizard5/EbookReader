@@ -1,4 +1,6 @@
 #Handles all mySQL connection related stuff.
+from datetime import datetime, time
+
 import mysql.connector
 from mysql.connector import pooling
 
@@ -64,5 +66,33 @@ class connection:
     #    return res
     def createUserEntry(self, user_name, password):
         pass
+
+    def getRecentlyListened(self):
+        conn = db_pool.get_connection()
+        try:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM recently_listened ORDER BY last_listened_date DESC;")
+            res = cursor.fetchall()
+            cursor.close()
+            return res
+        finally:
+            conn.close()
+
+    def updateRecentlyListened(self, book_id):
+        conn = db_pool.get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM recently_listened WHERE book_id = %s;", (book_id,))
+            existing_entry = cursor.fetchone()
+            current_timestamp = int(time.time())
+            current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            if existing_entry:
+                cursor.execute("UPDATE recently_listened SET timestamp = %s, last_listened_date = %s WHERE book_id = %s;", (current_timestamp, current_datetime, book_id))
+            else:
+                cursor.execute("INSERT INTO recently_listened (book_id, timestamp, last_listened_date) VALUES (%s, %s, %s);", (book_id, current_timestamp, current_datetime))
+            conn.commit()
+            cursor.close()
+        finally:
+            conn.close()
 
     
