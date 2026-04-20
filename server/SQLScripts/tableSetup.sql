@@ -23,7 +23,7 @@ CREATE TABLE recently_listened(
 id int AUTO_INCREMENT,
 book_id int NOT NULL,
 timestamp int NOT NULL,
-last_listened_date datetime NOT NULL,
+date datetime NOT NULL,
 PRIMARY KEY (id),
 FOREIGN KEY (book_id) REFERENCES books(id)
 );

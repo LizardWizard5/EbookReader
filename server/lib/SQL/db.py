@@ -71,7 +71,7 @@ class connection:
         conn = db_pool.get_connection()
         try:
             cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM recently_listened ORDER BY last_listened_date DESC;")
+            cursor.execute("SELECT * FROM recently_listened ORDER BY date DESC;")
             res = cursor.fetchall()
             cursor.close()
             return res
@@ -87,9 +87,9 @@ class connection:
             current_timestamp = int(time.time())
             current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             if existing_entry:
-                cursor.execute("UPDATE recently_listened SET timestamp = %s, last_listened_date = %s WHERE book_id = %s;", (current_timestamp, current_datetime, book_id))
+                cursor.execute("UPDATE recently_listened SET timestamp = %s, date = %s WHERE book_id = %s;", (current_timestamp, current_datetime, book_id))
             else:
-                cursor.execute("INSERT INTO recently_listened (book_id, timestamp, last_listened_date) VALUES (%s, %s, %s);", (book_id, current_timestamp, current_datetime))
+                cursor.execute("INSERT INTO recently_listened (book_id, timestamp, date) VALUES (%s, %s, %s);", (book_id, current_timestamp, current_datetime))
             conn.commit()
             cursor.close()
         finally:

@@ -50,7 +50,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" styleClass="root-container" stylesheets="@style.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.lizardwizard.ebookclient.MainController">
+<VBox prefHeight="600.0" prefWidth="900.0" styleClass="root-container" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.lizardwizard.ebookclient.MainController">
     <children>
 
         <!-- ── Menu Bar ── -->
@@ -95,22 +95,23 @@
         </MenuBar>
 
         <!-- ── Main Three-Panel Split ── -->
-        <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512"
-                   focusTraversable="true"
-                   styleClass="main-split"
-                   prefHeight="-1.0" prefWidth="-1.0"
-                   VBox.vgrow="ALWAYS">
+        <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" styleClass="main-split" VBox.vgrow="ALWAYS">
             <items>
 
                 <!-- ── Left Panel: Library ── -->
                 <VBox styleClass="panel-library" HBox.hgrow="ALWAYS">
                     <children>
-                        <Label text="My Library" styleClass="panel-title">
+                        <Label styleClass="panel-title" text="My Library">
                             <VBox.margin>
-                                <Insets top="16.0" left="14.0" bottom="8.0" />
+                                <Insets bottom="8.0" left="14.0" top="16.0" />
                             </VBox.margin>
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
                         </Label>
-                        <ListView fx:id="BookList" styleClass="book-list" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                  <Label prefHeight="4.0" prefWidth="138.0" styleClass="panel-title" text="Recently Listened" />
+                  <ListView fx:id="RecentBooksList" prefHeight="200.0" prefWidth="200.0" styleClass="book-list" />
+                        <ListView fx:id="BookList" prefHeight="200.0" prefWidth="200.0" styleClass="book-list" VBox.vgrow="ALWAYS" />
                         <HBox alignment="CENTER" spacing="8.0" styleClass="library-actions">
                             <children>
                                 <Button fx:id="AddBookButton" mnemonicParsing="false" onAction="#onUploadPdf" styleClass="btn-primary" text="＋ Upload PDF" />
@@ -118,90 +119,69 @@
                                 <Button mnemonicParsing="false" onAction="#onTestPopup" styleClass="btn-ghost" text="Test" />
                             </children>
                             <padding>
-                                <Insets top="12.0" bottom="12.0" left="10.0" right="10.0" />
+                                <Insets bottom="12.0" left="10.0" right="10.0" top="12.0" />
                             </padding>
                         </HBox>
                     </children>
                 </VBox>
 
                 <!-- ── Centre Panel: Player ── -->
-                <VBox alignment="CENTER" styleClass="panel-player" prefHeight="200.0" prefWidth="100.0">
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="panel-player">
                     <children>
-                        <VBox alignment="CENTER" spacing="10.0" styleClass="player-card" prefWidth="420.0">
+                        <VBox alignment="CENTER" prefWidth="420.0" spacing="10.0" styleClass="player-card">
                             <children>
                                 <!-- Time display -->
-                                <Text fx:id="timeText"
-                                      styleClass="time-text"
-                                      strokeType="OUTSIDE" strokeWidth="0.0"
-                                      text="00:00:00 / 00:00:00  ·  0% Completed"
-                                      textAlignment="CENTER"
-                                      wrappingWidth="380.0" />
+                                <Text fx:id="timeText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="time-text" text="00:00:00 / 00:00:00  ·  0% Completed" textAlignment="CENTER" wrappingWidth="380.0" />
 
                                 <!-- Scrub bar row -->
-                                <HBox alignment="CENTER" spacing="10.0" prefHeight="36.0">
+                                <HBox alignment="CENTER" prefHeight="36.0" spacing="10.0">
                                     <children>
-                                        <Button fx:id="rewindButton" disable="true" mnemonicParsing="false"
-                                                onAction="#onRewindButton" styleClass="btn-transport"
-                                                text="⏮  −10s" />
-                                        <Slider fx:id="audioTimeline" blockIncrement="0.01" disable="true"
-                                                minWidth="200.0" prefHeight="14.0" prefWidth="240.0"
-                                                styleClass="audio-slider">
+                                        <Button fx:id="rewindButton" disable="true" mnemonicParsing="false" onAction="#onRewindButton" styleClass="btn-transport" text="⏮  −10s" />
+                                        <Slider fx:id="audioTimeline" blockIncrement="0.01" disable="true" minWidth="200.0" prefHeight="14.0" prefWidth="240.0" styleClass="audio-slider">
                                             <HBox.margin>
                                                 <Insets top="4.0" />
                                             </HBox.margin>
                                         </Slider>
-                                        <Button fx:id="fastForwardButton" disable="true" mnemonicParsing="false"
-                                                onAction="#onFastForwardButton" styleClass="btn-transport"
-                                                text="+10s  ⏭" />
+                                        <Button fx:id="fastForwardButton" disable="true" mnemonicParsing="false" onAction="#onFastForwardButton" styleClass="btn-transport" text="+10s  ⏭" />
                                     </children>
                                 </HBox>
 
                                 <!-- Play/Pause -->
                                 <HBox alignment="CENTER">
                                     <children>
-                                        <Button fx:id="playButton" disable="true" mnemonicParsing="false"
-                                                onAction="#onPlayButton" styleClass="btn-play"
-                                                text="⏸  Pause" />
+                                        <Button fx:id="playButton" disable="true" mnemonicParsing="false" onAction="#onPlayButton" styleClass="btn-play" text="⏸  Pause" />
                                     </children>
                                     <VBox.margin>
-                                        <Insets top="6.0" bottom="6.0" />
+                                        <Insets bottom="6.0" top="6.0" />
                                     </VBox.margin>
                                 </HBox>
                             </children>
                             <padding>
-                                <Insets top="24.0" bottom="24.0" left="24.0" right="24.0" />
+                                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
                             </padding>
                         </VBox>
                     </children>
                 </VBox>
 
                 <!-- ── Right Panel: Book Details ── -->
-                <VBox alignment="TOP_CENTER" styleClass="panel-details" prefHeight="511.0" prefWidth="221.0">
+                <VBox alignment="TOP_CENTER" prefHeight="511.0" prefWidth="221.0" styleClass="panel-details">
                     <children>
                         <HBox prefHeight="30.0" prefWidth="200.0">
                             <children>
-                                <Label text="Book Details" styleClass="panel-title" />
+                                <Label styleClass="panel-title" text="Book Details" />
                             </children>
                             <VBox.margin>
-                                <Insets left="14.0" top="16.0" bottom="12.0" />
+                                <Insets bottom="12.0" left="14.0" top="16.0" />
                             </VBox.margin>
                         </HBox>
 
-                        <ImageView fx:id="DetailsBookImage"
-                                   fitHeight="253.0" fitWidth="190.0"
-                                   opacity="0.0"
-                                   pickOnBounds="true" preserveRatio="true"
-                                   styleClass="book-cover">
+                        <ImageView fx:id="DetailsBookImage" fitHeight="253.0" fitWidth="190.0" opacity="0.0" pickOnBounds="true" preserveRatio="true" styleClass="book-cover">
                             <VBox.margin>
-                                <Insets top="8.0" bottom="14.0" />
+                                <Insets bottom="14.0" top="8.0" />
                             </VBox.margin>
                         </ImageView>
 
-                        <Text fx:id="NowListeningText"
-                              opacity="0.0"
-                              strokeType="OUTSIDE" strokeWidth="0.0"
-                              styleClass="now-listening-text"
-                              text="Text" />
+                        <Text fx:id="NowListeningText" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="now-listening-text" text="Text" />
                     </children>
                 </VBox>
 
@@ -211,8 +191,7 @@
         <!-- ── Status Bar ── -->
         <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" styleClass="status-bar" VBox.vgrow="NEVER">
             <children>
-                <Label fx:id="statusText" maxHeight="1.7976931348623157E308" maxWidth="-1.0"
-                       styleClass="status-label" HBox.hgrow="ALWAYS">
+                <Label fx:id="statusText" maxHeight="1.7976931348623157E308" maxWidth="-1.0" styleClass="status-label" HBox.hgrow="ALWAYS">
                     <font>
                         <Font size="11.0" fx:id="x3" />
                     </font>
@@ -221,8 +200,7 @@
                     </textFill>
                 </Label>
                 <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-                <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4"
-                       styleClass="status-label" HBox.hgrow="NEVER" />
+                <Label font="$x3" maxWidth="-1.0" styleClass="status-label" text="Right status" textFill="$x4" HBox.hgrow="NEVER" />
             </children>
             <padding>
                 <Insets bottom="4.0" left="10.0" right="10.0" top="4.0" />

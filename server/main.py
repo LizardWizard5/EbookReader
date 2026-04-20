@@ -7,7 +7,7 @@ import uuid
 from flask_cors import CORS
 from flask import Flask, jsonify, Response,request
 from lib.SQL.db import connection
-
+import dotenv
 import lib.ParseGenerate
 
 #Windows + Linux compatible path handling
@@ -17,10 +17,14 @@ bookDirectory= os.path.join(currentDirectory, "books", "pdf")
 audioDirectory = os.path.join(currentDirectory, "books", "audio")
 coverDirectory = os.path.join(currentDirectory, "books", "covers")
 
+
+#Load environment variables from .env file
+dotenv.load_dotenv()
 #Initialize mySQL connection here
 #Adjust pool size as needed, it is used to handle multiple requests at once. 5 is good for a self hosted system
 if not os.getenv("HOST") or not os.getenv("USER") or not os.getenv("PASSWORD"):
     print("Database credentials not found in environment variables. Please set HOST, USER, and PASSWORD.")
+    print(os.getcwd())
     exit(1)
 db = connection(host=os.getenv("HOST"), user=os.getenv("USER"), password=os.getenv("PASSWORD"),pool_size=5)
 
