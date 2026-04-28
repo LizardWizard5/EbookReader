@@ -7,7 +7,7 @@ import uuid
 from flask_cors import CORS
 from flask import Flask, jsonify, Response,request
 from lib.SQL.db import connection
-
+import dotenv
 import lib.ParseGenerate
 
 #Windows + Linux compatible path handling
@@ -17,10 +17,14 @@ bookDirectory= os.path.join(currentDirectory, "books", "pdf")
 audioDirectory = os.path.join(currentDirectory, "books", "audio")
 coverDirectory = os.path.join(currentDirectory, "books", "covers")
 
+
+#Load environment variables from .env file
+dotenv.load_dotenv()
 #Initialize mySQL connection here
 #Adjust pool size as needed, it is used to handle multiple requests at once. 5 is good for a self hosted system
 if not os.getenv("HOST") or not os.getenv("USER") or not os.getenv("PASSWORD"):
     print("Database credentials not found in environment variables. Please set HOST, USER, and PASSWORD.")
+    print(os.getcwd())
     exit(1)
 db = connection(host=os.getenv("HOST"), user=os.getenv("USER"), password=os.getenv("PASSWORD"),pool_size=5)
 
@@ -146,6 +150,23 @@ def book_pdf_api(book_id):
         return Response("Not Found", 404)
     return Response(pdfFile, mimetype='application/pdf')
 
+@app.route("/books/recently_listened")
+def recently_listened_api():
+    recently_listened = db.getRecentlyListened()
+    print(f"Recently listened retrieved: {recently_listened}")
+    if recently_listened is None:
+        return Response("{}", 200)
+    return jsonify(recently_listened),200
+@app.route("/books/<book_id>/update_recently_listened", methods=["POST"])
+def update_recently_listened_api(book_id):
+    try:
+        position = request.form.get("position", type=int, default=0)
+        db.updateRecentlyListened(book_id, position)
+        return Response("Updated recently listened", 200)
+    except Exception as e:
+        print(f"Error updating recently listened: {e}")
+        return Response("Error updating recently listened", 500)
+    
 #POST request to upload pdf file for parsing and audio generation
 @app.route("/upload", methods=["POST"])
 def upload_pdf():

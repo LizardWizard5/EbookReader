@@ -1,11 +1,10 @@
 package ca.lizardwizard.ebookclient;
 
-import ca.lizardwizard.ebookclient.Lib.ApiCalls;
-import ca.lizardwizard.ebookclient.Lib.AudioPlayer;
-import ca.lizardwizard.ebookclient.Lib.Popup;
-import ca.lizardwizard.ebookclient.Lib.SceneUtil;
+import ca.lizardwizard.ebookclient.Lib.*;
 import ca.lizardwizard.ebookclient.objects.Book;
 
+import ca.lizardwizard.ebookclient.objects.RecentlyListened;
+import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 
@@ -29,8 +28,11 @@ import javafx.scene.media.MediaPlayer;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -40,7 +42,8 @@ public class MainController implements Initializable {
 
     @FXML
     private Button AddBookButton;
-
+    @FXML
+    private ListView<Book> RecentBooksList;
     @FXML
     private ListView<Book> BookList;
 
@@ -76,46 +79,118 @@ public class MainController implements Initializable {
 
     private Timeline timeline;
 
+
+    private void setupMediaPlayer(Book currentBook) throws FileNotFoundException {
+        //Construct url.
+        String host = new EnvReader<String>().readVar("HOST");
+        String port = new EnvReader<String>().readVar("PORT");
+        String baseUrl = "http://" + host + ":" + port;
+        Media media = new Media(baseUrl + "/stream/" + currentBook.getId());
+
+        mediaPlayer = new MediaPlayer(media);
+
+        //Play Audio on ready
+        mediaPlayer.setOnReady(() -> {
+            // Set slider range to the duration of the book
+            double totalMs = mediaPlayer.getTotalDuration().toMillis();
+            if(currentBook.getLastListenedTimestamp() !=0){
+                mediaPlayer.seek(Duration.millis(currentBook.getLastListenedTimestamp()));
+            }
+            mediaPlayer.play();
+            audioTimeline.setMax(totalMs);
+        });
+        //Listens for changes in time and updates slider and time text accordingly
+        mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            if (!audioTimeline.isValueChanging()) { // Don't move slider while user is dragging it
+                audioTimeline.setValue(newTime.toMillis());
+                timeText.setText(getFormattedLength((long)Duration.millis(audioTimeline.getValue()).toMillis(),(long)mediaPlayer.getTotalDuration().toMillis()));
+            }
+        });
+        //This is for when user drags slider to update time.
+        audioTimeline.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
+            if (!isChanging) { // User let go of the slider
+                mediaPlayer.seek(Duration.millis(audioTimeline.getValue()));
+                //Update time text
+                timeText.setText(getFormattedLength((long)Duration.millis(audioTimeline.getValue()).toMillis(),(long)mediaPlayer.getTotalDuration().toMillis()));
+                //Update recently listened position on server
+                try {
+                    ApiCalls.postRecentlyListened(currentBook.getId(), (long) mediaPlayer.getCurrentTime().toMillis());
+                    currentBook.setLastListenedTimestamp((long) mediaPlayer.getCurrentTime().toMillis()); // Reflect change in current book.
+                } catch (IOException e) {
+                    //throw new RuntimeException(e);
+                    new Popup("Error!","Error","An error has occurred while updating your recently listened list. This means that the app has failed to log your current listening positon. If you continue, your positon in this book might not be stored.","Ok","Contact server administration or open a git issue with the following error:\n"+e.getMessage());
+                }
+            }
+        });
+
+    }
+
+
+    private void buildUI(Book currentBook) throws FileNotFoundException {
+        //Construct url.
+        String host = new EnvReader<String>().readVar("HOST");
+        String port = new EnvReader<String>().readVar("PORT");
+        String baseUrl = "http://" + host + ":" + port;
+        //Setup UI
+        NowListeningText.setText("Now Listening to "+currentBook.getName() +"\nBy " + currentBook.getAuthor());
+        statusText.setText("Now Listening to "+currentBook.getName() +" By " + currentBook.getAuthor());
+        DetailsBookImage.setImage(new Image(baseUrl+"/books/"+currentBook.getId()+"/cover"));
+        DetailsBookImage.setOpacity(1);
+        NowListeningText.setOpacity(1);
+
+        rewindButton.setDisable(false);
+        fastForwardButton.setDisable(false);
+        audioTimeline.setDisable(false);
+        playButton.setDisable(false);
+    }
+
+    private void selectBook(Book book){
+        try {
+            if(timeline != null){
+                timeline.stop();
+            }
+            if(mediaPlayer != null){
+                mediaPlayer.stop();
+            }
+            setupMediaPlayer(book);
+            buildUI(book);
+            timeline = getTimeline(book);
+            timeline.play();
+        } catch (FileNotFoundException e) {
+            //throw new RuntimeException(e);
+            new Popup("Error!","Error","An error has occurred while trying to play this book. This means that the app has failed to load the audio stream for this book. If you continue, you will not be able to listen to this book.","Ok","Contact server administration or open a git issue with the following error:\n"+e.getMessage());
+        }
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try{
+        try {
+
+            Book[] books = ApiCalls.getBooks();
+            RecentlyListened[] recentlyListened = ApiCalls.getRecentlyListened();
+            //Assort books by most recently listened adding rest to BookList
+            for (RecentlyListened r : recentlyListened) {
+                for (Book b : books) {
+                    if (b.getId() == r.getBookId()) {
+                        RecentBooksList.getItems().add(b);
+                        b.setLastListenedTimestamp(r.getTimestamp());
+
+                        System.out.println("Added " + b);
+                    }
+                }
+            }
+
+
+
             BookList.getItems().addAll(ApiCalls.getBooks());
+
+
+            RecentBooksList.getSelectionModel().selectedItemProperty().addListener((observe, previousBook, currentBook)->{
+               selectBook(currentBook);
+            });
+
             BookList.getSelectionModel().selectedItemProperty().addListener((observe, previousBook, currentBook)->{
-                //Start getting media loaded
-                Media media = new Media("http://127.0.0.1:5000/stream/"+currentBook.getId());
-                mediaPlayer = new MediaPlayer(media);
-                //Setup UI
-                NowListeningText.setText("Now Listening to "+currentBook.getName() +"\nBy " + currentBook.getAuthor());
-                statusText.setText("Now Listening to "+currentBook.getName() +" By " + currentBook.getAuthor());
-                DetailsBookImage.setImage(new Image("http://localhost:5000/books/"+currentBook.getId()+"/cover"));
-                DetailsBookImage.setOpacity(1);
-                NowListeningText.setOpacity(1);
-
-                rewindButton.setDisable(false);
-                fastForwardButton.setDisable(false);
-                audioTimeline.setDisable(false);
-                playButton.setDisable(false);
-                //Play Audio on ready
-                mediaPlayer.setOnReady(() -> {
-                    // Set slider range to the duration of the book
-                    double totalMs = mediaPlayer.getTotalDuration().toMillis();
-                    mediaPlayer.play();
-                    audioTimeline.setMax(totalMs);
-                });
-
-                mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-                    if (!audioTimeline.isValueChanging()) { // Don't move slider while user is dragging it
-                        audioTimeline.setValue(newTime.toMillis());
-                        timeText.setText(getFormattedLength((long)Duration.millis(audioTimeline.getValue()).toMillis(),(long)mediaPlayer.getTotalDuration().toMillis()));
-                    }
-                });
-
-                audioTimeline.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
-                    if (!isChanging) { // User let go of the slider
-                        mediaPlayer.seek(Duration.millis(audioTimeline.getValue()));
-                    }
-                });
-
+                selectBook(currentBook);
             });
 
 
@@ -125,6 +200,21 @@ public class MainController implements Initializable {
             new Popup("Error!","Error Unknown","An error has occurred at an early stage in starting the application, it's best to restart.","Ok","Contact server administration or open a git issue with the following error:\n"+e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+
+    private Timeline getTimeline(Book currentBook) {
+        Timeline timer = new Timeline(new KeyFrame(Duration.minutes(2), event -> {
+            try {
+                ApiCalls.postRecentlyListened(currentBook.getId(), (long) mediaPlayer.getCurrentTime().toMillis());
+                currentBook.setLastListenedTimestamp((long) mediaPlayer.getCurrentTime().toMillis());
+            } catch (IOException e) {
+                //throw new RuntimeException(e);
+                new Popup("Error!","Error","An error has occurred while updating your recently listened list. This means that the app has failed to log your current listening positon. If you continue, your positon in this book might not be stored.","Ok","Contact server administration or open a git issue with the following error:\n"+e.getMessage());
+            }
+        }));
+        timer.setCycleCount(Timeline.INDEFINITE);
+        return timer;
     }
 
     @FXML

@@ -14,6 +14,7 @@ module ca.lizardwizard.ebookclient {
     requires org.apache.httpcomponents.core5.httpcore5;
 
 
+
     opens ca.lizardwizard.ebookclient to javafx.fxml;
     exports ca.lizardwizard.ebookclient;
     exports ca.lizardwizard.ebookclient.Lib;
