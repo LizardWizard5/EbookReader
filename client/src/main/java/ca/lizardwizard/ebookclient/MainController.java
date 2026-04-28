@@ -93,6 +93,9 @@ public class MainController implements Initializable {
         mediaPlayer.setOnReady(() -> {
             // Set slider range to the duration of the book
             double totalMs = mediaPlayer.getTotalDuration().toMillis();
+            if(currentBook.getLastListenedTimestamp() !=0){
+                mediaPlayer.seek(Duration.millis(currentBook.getLastListenedTimestamp()));
+            }
             mediaPlayer.play();
             audioTimeline.setMax(totalMs);
         });
@@ -107,6 +110,16 @@ public class MainController implements Initializable {
         audioTimeline.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
             if (!isChanging) { // User let go of the slider
                 mediaPlayer.seek(Duration.millis(audioTimeline.getValue()));
+                //Update time text
+                timeText.setText(getFormattedLength((long)Duration.millis(audioTimeline.getValue()).toMillis(),(long)mediaPlayer.getTotalDuration().toMillis()));
+                //Update recently listened position on server
+                try {
+                    ApiCalls.postRecentlyListened(currentBook.getId(), (long) mediaPlayer.getCurrentTime().toMillis());
+                    currentBook.setLastListenedTimestamp((long) mediaPlayer.getCurrentTime().toMillis()); // Reflect change in current book.
+                } catch (IOException e) {
+                    //throw new RuntimeException(e);
+                    new Popup("Error!","Error","An error has occurred while updating your recently listened list. This means that the app has failed to log your current listening positon. If you continue, your positon in this book might not be stored.","Ok","Contact server administration or open a git issue with the following error:\n"+e.getMessage());
+                }
             }
         });
 
@@ -151,29 +164,26 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try{
-            Book[] books = ApiCalls.getBooks();
-            List<RecentlyListened> recentlyListened = Arrays.asList(ApiCalls.getRecentlyListened());
-            //Assort books by most recently listened adding rest to BookList
-            if(!recentlyListened.isEmpty()){
-                for(Book book:books){
-                    for(RecentlyListened listened:recentlyListened){
-                        if(listened.getId() == book.getId()){
-                            book.setName(book.getName()+" (Last Listened: "+listened.getDate()+"  Current Position: "+listened.getTimestamp()+")");
-                            RecentBooksList.getItems().add(book);
-                            break;
-                        }
+        try {
 
-                    }
-                    if(recentlyListened.stream().noneMatch(l->l.getId() == book.getId())){
-                        BookList.getItems().add(book);
+            Book[] books = ApiCalls.getBooks();
+            RecentlyListened[] recentlyListened = ApiCalls.getRecentlyListened();
+            //Assort books by most recently listened adding rest to BookList
+            for (RecentlyListened r : recentlyListened) {
+                for (Book b : books) {
+                    if (b.getId() == r.getBookId()) {
+                        RecentBooksList.getItems().add(b);
+                        b.setLastListenedTimestamp(r.getTimestamp());
+
+                        System.out.println("Added " + b);
                     }
                 }
             }
-            else {
-                RecentBooksList.setDisable(true);
-                BookList.getItems().addAll(ApiCalls.getBooks());
-            }
+
+
+
+            BookList.getItems().addAll(ApiCalls.getBooks());
+
 
             RecentBooksList.getSelectionModel().selectedItemProperty().addListener((observe, previousBook, currentBook)->{
                selectBook(currentBook);
@@ -197,6 +207,7 @@ public class MainController implements Initializable {
         Timeline timer = new Timeline(new KeyFrame(Duration.minutes(2), event -> {
             try {
                 ApiCalls.postRecentlyListened(currentBook.getId(), (long) mediaPlayer.getCurrentTime().toMillis());
+                currentBook.setLastListenedTimestamp((long) mediaPlayer.getCurrentTime().toMillis());
             } catch (IOException e) {
                 //throw new RuntimeException(e);
                 new Popup("Error!","Error","An error has occurred while updating your recently listened list. This means that the app has failed to log your current listening positon. If you continue, your positon in this book might not be stored.","Ok","Contact server administration or open a git issue with the following error:\n"+e.getMessage());

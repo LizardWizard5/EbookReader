@@ -87,7 +87,9 @@ def generateTTS(text,fileName):
 
 def convert_to_mp3(wav_path, mp3_path):
     # -ac 1: Mono, -ar 24000: Sample rate, -ab 64k: Bitrate
+    print(f"Converting {wav_path} to {mp3_path}...")
     try:
+       
         subprocess.run(['lame', wav_path, mp3_path], check=True)
         #subprocess.run(['ffmpeg', '-i', wav_path, '-ac', '1', '-ar', '24000', '-ab', '64k', mp3_path])
         os.remove(wav_path)  # Remove the original WAV file after conversion

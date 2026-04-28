@@ -110,8 +110,8 @@
                      </font>
                         </Label>
                   <Label prefHeight="4.0" prefWidth="138.0" styleClass="panel-title" text="Recently Listened" />
-                  <ListView fx:id="RecentBooksList" prefHeight="200.0" prefWidth="200.0" styleClass="book-list" />
                         <ListView fx:id="BookList" prefHeight="200.0" prefWidth="200.0" styleClass="book-list" VBox.vgrow="ALWAYS" />
+                  <ListView fx:id="RecentBooksList" prefHeight="200.0" prefWidth="200.0" styleClass="book-list" />
                         <HBox alignment="CENTER" spacing="8.0" styleClass="library-actions">
                             <children>
                                 <Button fx:id="AddBookButton" mnemonicParsing="false" onAction="#onUploadPdf" styleClass="btn-primary" text="＋ Upload PDF" />

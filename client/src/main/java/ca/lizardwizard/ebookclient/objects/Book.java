@@ -14,6 +14,8 @@ public class Book {
     @SerializedName("coverURL")
     private String coverURL;
 
+    private long lastListenedTimestamp = 0;
+
 
     public Book(int id, String name, String author, String description, String coverURL) {
         this.id = id;
@@ -63,8 +65,16 @@ public class Book {
         this.id = id;
     }
 
+
+    public void setLastListenedTimestamp(long timestamp){
+        this.lastListenedTimestamp = timestamp;
+    }
+    public long getLastListenedTimestamp(){
+        return lastListenedTimestamp;
+    }
+
     @Override
     public String toString(){
-        return getName();
+        return name + " By " + author;
     }
 }

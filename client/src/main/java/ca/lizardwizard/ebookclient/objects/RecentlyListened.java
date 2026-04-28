@@ -6,9 +6,11 @@ public class RecentlyListened {
     @SerializedName("id")
     private int id;
     @SerializedName("timestamp")
-    private String timestamp;
+    private long timestamp;
     @SerializedName("date")
     private String date;
+    @SerializedName("book_id")
+    private int bookId;
 
     public int getId() {
         return id;
@@ -18,11 +20,16 @@ public class RecentlyListened {
         this.id = id;
     }
 
-    public String getTimestamp() {
+    public int getBookId() {
+        return bookId;
+    }
+
+
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

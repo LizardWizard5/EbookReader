@@ -153,13 +153,15 @@ def book_pdf_api(book_id):
 @app.route("/books/recently_listened")
 def recently_listened_api():
     recently_listened = db.getRecentlyListened()
+    print(f"Recently listened retrieved: {recently_listened}")
     if recently_listened is None:
         return Response("{}", 200)
     return jsonify(recently_listened),200
 @app.route("/books/<book_id>/update_recently_listened", methods=["POST"])
 def update_recently_listened_api(book_id):
     try:
-        db.updateRecentlyListened(book_id)
+        position = request.form.get("position", type=int, default=0)
+        db.updateRecentlyListened(book_id, position)
         return Response("Updated recently listened", 200)
     except Exception as e:
         print(f"Error updating recently listened: {e}")
