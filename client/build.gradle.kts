@@ -3,7 +3,7 @@
     application
     id("org.javamodularity.moduleplugin") version "1.8.15"
     id("org.openjfx.javafxplugin") version "0.0.13"
-    id("org.beryx.jlink") version "2.25.0"
+    id("org.beryx.jlink") version "3.2.1"
 }
 
 group = "ca.lizardwizard"
@@ -28,6 +28,13 @@ application {
     mainModule.set("ca.lizardwizard.ebookclient")
     mainClass.set("ca.lizardwizard.ebookclient.HelloApplication")
 }
+    tasks.jar {
+        manifest {
+            attributes(
+                "Main-Class" to "ca.lizardwizard.ebookclient.HelloApplication"
+            )
+        }
+    }
 
 javafx {
     version = "21.0.6"
