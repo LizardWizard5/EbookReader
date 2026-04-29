@@ -8,13 +8,14 @@ Created with the purpose of escaping the need to actually read my history essay 
 * mySQL db
 ## Things you must do
 * Install dependencies specified in **requirements.txt**
+* Install LAME MP3 Encoder
 * Setup mySQL database using the provided SQL script in **Server/SQLScripts**
 * Create a **.env** file containing:
 	* HOST: mySQL database hostname
 	* USER: mySQL database username
 	* PASSWORD: mySQL database password
 	* PORT: Desired port to run on
-	* HOST: Desired host to run on
+	* IP: Desired ip to run on.
 * Create a **allowedips.txt** file that contains a list of ips you will allow the server to interact with
 
 
@@ -22,6 +23,10 @@ Created with the purpose of escaping the need to actually read my history essay 
 # Client
 * JavaFX
 * ApacheHttpClient
+## Things you must do
+* Create a env.txt and add the following:
+	* HOST:<YOUR HOST IP OR DOMAIN NAME>
+	* PORT: <YOUR PORT>
 
 
 
