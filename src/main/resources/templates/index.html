@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Library</title>
+</head>
+<body>
+
+<h1>All Books</h1>
+
+<ul>
+    <!-- Iterate over the 'books' model attribute -->
+    <li th:each="book : ${books}">
+        <strong th:text="${book.name}">Book Title</strong> by
+        <span th:text="${book.author}">Author</span>
+
+    </li>
+</ul>
+<p>Hello World!! Test test</p>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books List - JSON Format</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #4ec9b0;
+        }
+        button {
+            background-color: #0e639c;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #1177bb;
+        }
+        pre {
+            background-color: #252526;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #3c3c3c;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ce9178;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Books Data (JSON)</h1>
+        <button onclick="copyJson()">Copy JSON</button>
+    </div>
+
+    <pre><code id="json-display">Loading JSON...</code></pre>
+</div>
+
+<script th:inline="javascript">
+    // Thymeleaf automatically serializes the Java List<Book> into a JavaScript array
+    /*<![CDATA[*/
+    const books = /*[[${books}]]*/ [];
+    /*]]>*/
+
+    // Format JSON with 2-space indentation and display it
+    const jsonString = JSON.stringify(books, null, 2);
+    document.getElementById('json-display').textContent = jsonString;
+
+    // Helper function to copy JSON data to clipboard
+    function copyJson() {
+        navigator.clipboard.writeText(jsonString).then(() => {
+            alert('JSON copied to clipboard!');
+        });
+    }
+</script>
+
+</body>
+</html>
