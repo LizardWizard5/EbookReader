@@ -9,7 +9,7 @@ public class RecentlyListened {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     // Maps the Foreign Key (book_id) to the Book entity
     @ManyToOne(fetch = FetchType.LAZY)
@@ -19,7 +19,7 @@ public class RecentlyListened {
     // Map the Foreign Key (user_id) to the User entity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users users;
     @Column(nullable = false)
     private Integer timestamp; // Stores seconds played or UNIX timestamp
 
@@ -31,19 +31,19 @@ public class RecentlyListened {
     }
 
     // Parameterized Constructor
-    public RecentlyListened(Book book, Integer timestamp, LocalDateTime date, User user) {
+    public RecentlyListened(Book book, Integer timestamp, LocalDateTime date, Users users) {
         this.book = book;
         this.timestamp = timestamp;
         this.date = date;
-        this.user = user;
+        this.users = users;
     }
 
     // Getters and Setters
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -71,6 +71,6 @@ public class RecentlyListened {
         this.date = date;
     }
 
-    public User getUser() {return user;}
-    public void setUser(User user) {this.user = user;}
+    public Users getUser() {return users;}
+    public void setUser(Users users) {this.users = users;}
 }

@@ -8,7 +8,7 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -34,14 +34,14 @@ public class Book {
     // Map the Foreign Key (user_id) to the User entity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users user;
 
     // Standard Default Constructor (Required by JPA)
-    public Book() {
+    protected Book() {
     }
 
     // Parameterized Constructor (Convenient for creating new instances)
-    public Book(String name, String author, String description, String pdfName, String audioName, String coverName, Integer audioLength, User user) {
+    public Book(String name, String author, String description, String pdfName, String audioName, String coverName, Integer audioLength, Users user) {
         this.name = name;
         this.author = author;
         this.description = description;
@@ -49,15 +49,16 @@ public class Book {
         this.audioName = audioName;
         this.coverName = coverName;
         this.audioLength = audioLength;
+        this.user = user;
     }
 
 
     // Getters and Setters
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -117,6 +118,6 @@ public class Book {
         this.audioLength = audioLength;
     }
 
-    public User getUser() {return user;}
-    public void setUser(User user) {this.user = user;}
+    public Users getUser() {return user;}
+    public void setUser(Users user) {this.user = user;}
 }

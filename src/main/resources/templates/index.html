@@ -2,19 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Library</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
 </head>
 <body>
+<div th:replace="~{fragments/header.html :: header}"></div>
+<div th:replace="~{fragments/sidebar.html :: sidebar}"></div>
+<div class="main-content">
+    <h1>All Books</h1>
 
-<h1>All Books</h1>
+    <ul>
+        <!-- Iterate over the 'books' model attribute -->
+        <li th:each="book : ${books}">
+            <strong th:text="${book.name}">Book Title</strong> by
+            <span th:text="${book.author}">Author</span>
 
-<ul>
-    <!-- Iterate over the 'books' model attribute -->
-    <li th:each="book : ${books}">
-        <strong th:text="${book.name}">Book Title</strong> by
-        <span th:text="${book.author}">Author</span>
-
-    </li>
-</ul>
+        </li>
+    </ul>
+</div>
 <p>Hello World!! Test test</p>
 </body>
 </html>

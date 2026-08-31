@@ -7,12 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Integer> {
+public interface BookRepository extends JpaRepository<Book, Long> {
     // JpaRepository provides built-in CRUD methods:
     // - save(Book book)
-    // - findById(Integer id)
+    // - findById(Long id)
     // - findAll()
-    // - deleteById(Integer id)
+    // - deleteById(Long id)
 
     // Optional: Custom query methods derived from method names
     List<Book> findByAuthor(String author);
